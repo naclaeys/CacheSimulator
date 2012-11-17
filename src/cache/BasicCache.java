@@ -22,7 +22,7 @@ public class BasicCache extends Cache{
     public BasicCache(int blockCount, int ways) {
         super();
         time = 0;
-                
+        
         blocks = new CacheBlock[(blockCount+ways-1)/ways][ways];
         
         int count = 0;

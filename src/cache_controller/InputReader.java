@@ -13,8 +13,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import main.GCASimulator;
 
 /**
@@ -37,7 +35,7 @@ public class InputReader {
         }
     }
     
-    private void addInstructionsToThreads(int amount) {
+    private void addInstructionsToThreads() {
         int count = 0;
         String line = null;
         try {
@@ -46,7 +44,7 @@ public class InputReader {
             ex.printStackTrace();
             throw new RuntimeException(ex);
         }
-        while(line != null && count < amount) {
+        while(line != null && count < GCASimulator.READING_AMOUNT) {
             if(line.startsWith("@$")) {
                 String[] parts = line.split(" ");
                 int index = Integer.parseInt(parts[1]);
@@ -59,12 +57,12 @@ public class InputReader {
                 } else {
                     throw new IllegalArgumentException("Illegal instruction");
                 }
-                threads[0].getInstructions().add(instr);
+                threads[index].getInstructions().add(instr);
                 
                 count++;
             }
             
-            if(count < amount) {
+            if(count < GCASimulator.READING_AMOUNT) {
                 try {
                     line = reader.readLine();
                 } catch (IOException ex) {
@@ -86,7 +84,7 @@ public class InputReader {
     
     public Instruction getInstructionFromThread(int thread) {
         while(threads[thread].getInstructions().isEmpty() && !closed) {
-            addInstructionsToThreads(GCASimulator.READING_AMOUNT);
+            addInstructionsToThreads();
         }
         
         if(threads[thread].getInstructions().isEmpty()) {
