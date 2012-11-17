@@ -63,7 +63,7 @@ public class BasicCache extends Cache{
             
             if(j < set.length && set[j].getAddress() == adress) {
                 set[j].setTimeStamp(time);
-                
+                addCacheHit();
                 timeSum += HIT_COST;
             } else {
                 CacheBlock block;
@@ -92,6 +92,15 @@ public class BasicCache extends Cache{
             }
         }
         return set[oldestIndex];
+    }
+
+    @Override
+    public void clearCacheMemory() {
+        for(int i = 0; i < blocks.length; i++) {
+            for(int j = 0; j < blocks[i].length; j++) {
+                blocks[i][j].clear();
+            }
+        }
     }
     
 }

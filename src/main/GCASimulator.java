@@ -6,6 +6,7 @@ package main;
 
 import cache.BasicCache;
 import cache.Cache;
+import cache.ConfigurableCache;
 import cache_controller.CPU;
 import cache_controller.InputReader;
 import java.io.File;
@@ -41,12 +42,14 @@ public class GCASimulator {
         }
         
         InputReader reader = new InputReader(input, 2);
-        Cache cache = new BasicCache(4, 2);
-        CPU cpu = new CPU(reader, cache, 2);
+        Cache c1 = new BasicCache(4, 2);
+        Cache c2 = new ConfigurableCache(configuration);
+        CPU cpu = new CPU(reader, c2, 2);
         
         cpu.start();
         
         System.out.println("cyclus count: " + cpu.getCycleCount());
-        System.out.println("cache missers: " + cache.getTotalMisses());
+        System.out.println("cache missers: " + c2.getTotalMisses());
+        System.out.println("cache hits: " + c2.getCacheHits());
     }
 }

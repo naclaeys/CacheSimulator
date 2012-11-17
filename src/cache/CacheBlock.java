@@ -39,5 +39,9 @@ public class CacheBlock {
     public boolean isUsed() {
         return timeStamp != -1;
     }
+
+    void clear() {
+        timeStamp = -1;
+    }
     
 }
