@@ -41,7 +41,7 @@ public class GCASimulator {
         }
         
         InputReader reader = new InputReader(input, 2);
-        Cache cache = new BasicCache(input);
+        Cache cache = new BasicCache(4, 2);
         CPU cpu = new CPU(reader, cache, 2);
         
         cpu.start();

@@ -5,31 +5,24 @@
 package cache;
 
 import cache_controller.instruction.MemoryAccess;
-import java.io.File;
 
 /**
  *
  * @author Nathan
  */
 public class BasicCache extends Cache{
-    
+        
     public static final int HIT_COST = 1;
     public static final int MISS_COST = 10;
     
     private long time;
     
-    private int ways;
-    private int blockCount;
-    
     private CacheBlock[][] blocks;
     
-    public BasicCache(File config) {
+    public BasicCache(int blockCount, int ways) {
         super();
         time = 0;
-        
-        ways = 1;
-        blockCount = 1;
-        
+                
         blocks = new CacheBlock[(blockCount+ways-1)/ways][ways];
         
         int count = 0;
