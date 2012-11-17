@@ -40,7 +40,7 @@ public class GCASimulator {
             throw new IllegalArgumentException("File not found: " + args[2]);
         }
         
-        InputReader reader = new InputReader(input);
+        InputReader reader = new InputReader(input, 2);
         Cache cache = new BasicCache(input);
         CPU cpu = new CPU(reader, cache, 2);
         
@@ -48,7 +48,5 @@ public class GCASimulator {
         
         System.out.println("cyclus count: " + cpu.getCycleCount());
         System.out.println("cache missers: " + cache.getTotalMisses());
-        
-        reader.close();
     }
 }

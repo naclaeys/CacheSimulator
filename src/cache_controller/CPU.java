@@ -6,8 +6,6 @@ package cache_controller;
 
 import cache.Cache;
 import cache_controller.instruction.Instruction;
-import cache_controller.instruction.InstructionThread;
-import main.GCASimulator;
 
 /**
  *
@@ -18,8 +16,9 @@ public class CPU {
     private long cycleCount;
 
     private InputReader instructionReader;
-    private InstructionThread[] threads;
+    private int threadCount;
     private long[] waiting;
+    private boolean[] finished;
     
     private Cache cache;
 
@@ -27,11 +26,13 @@ public class CPU {
         this.cycleCount = 0;
         this.cache = cache;
         this.instructionReader = instructionReader;
-        this.threads = new InstructionThread[threadCount];
+        
+        this.threadCount = threadCount;
         this.waiting = new long[threadCount];
+        this.finished = new boolean[threadCount];
         for(int i = 0; i < threadCount; i++) {
-            threads[i] = new InstructionThread(i);
             waiting[i] = 0;
+            finished[i] = false;
         }
     }
 
@@ -41,31 +42,21 @@ public class CPU {
 
     public void start() {
         boolean done = false;
-        boolean readingLeft = true;
         
         // cyclus
         while(!done) {
-            if(readingLeft) {
-                for(int i = 0; i < threads.length; i++) {
-                    InstructionThread thread = threads[i];
-
-                    while(thread.getInstructions().isEmpty() && readingLeft) {
-                        readingLeft = !instructionReader.addInstructionsToThreads(GCASimulator.READING_AMOUNT, threads);
+            done = true;
+            for(int i = 0; i < threadCount; i++) {
+                if(!finished[i] && waiting[i] <= 0) {
+                    Instruction instr = instructionReader.getInstructionFromThread(i);
+                    
+                    finished[i] = instr == null;
+                    if(!finished[i]) {
+                        waiting[i] += instr.getExecutionTime(cache);
                     }
                 }
-            }
-            done = !readingLeft;
-            
-            for(int i = 0; i < threads.length; i++) {
-                InstructionThread thread = threads[i];
-                
-                if(!thread.getInstructions().isEmpty() && waiting[i] <= 0) {
-                    Instruction instr = thread.getInstructions().removeFirst();
-                    
-                    waiting[i] += instr.getExecutionTime(cache);
-                }
                 waiting[i]--;
-                done &= thread.getInstructions().isEmpty() && waiting[i] <= 0;
+                done &= finished[i] && waiting[i] <= 0;
             }
             
             cycleCount++;

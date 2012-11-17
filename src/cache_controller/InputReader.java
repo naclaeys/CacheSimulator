@@ -13,10 +13,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import main.GCASimulator;
 
 /**
  *
@@ -25,14 +24,20 @@ import java.util.Map;
 public class InputReader {
     
     BufferedReader reader;
+    private boolean closed;
+    
+    private InstructionThread[] threads;
 
-    public InputReader(File input) throws FileNotFoundException {
+    public InputReader(File input, int threadCount) throws FileNotFoundException {
         reader = new BufferedReader(new FileReader(input));
+        closed = false;
+        this.threads = new InstructionThread[threadCount];
+        for(int i = 0; i < threads.length; i++) {
+            threads[i] = new InstructionThread(i);
+        }
     }
     
-    public boolean addInstructionsToThreads(int amount, InstructionThread[] threadList) {
-        Map<Integer, List<Instruction>> threads = new HashMap<Integer, List<Instruction>>();
-        
+    private void addInstructionsToThreads(int amount) {
         int count = 0;
         String line = null;
         try {
@@ -44,11 +49,7 @@ public class InputReader {
         while(line != null && count < amount) {
             if(line.startsWith("@$")) {
                 String[] parts = line.split(" ");
-                
-                int key = Integer.parseInt(parts[1]);
-                if(!threads.containsKey(key)) {
-                    threads.put(key, new ArrayList<Instruction>(key));
-                }
+                int index = Integer.parseInt(parts[1]);
                 
                 Instruction instr = null;
                 if(parts[2].equals("INS")) {
@@ -58,7 +59,7 @@ public class InputReader {
                 } else {
                     throw new IllegalArgumentException("Illegal instruction");
                 }
-                threads.get(key).add(instr);
+                threads[0].getInstructions().add(instr);
                 
                 count++;
             }
@@ -67,22 +68,32 @@ public class InputReader {
                 try {
                     line = reader.readLine();
                 } catch (IOException ex) {
-                    ex.printStackTrace();
                     throw new RuntimeException(ex);
                 }
             }
         }
         
-        for(int i = 0; i < threadList.length; i++) {
-            if(threads.containsKey(threadList[i].getId())) {
-                threadList[i].getInstructions().addAll(threads.get(threadList[i].getId()));
+        if(line == null) {
+            try {
+                reader.close();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            } finally {
+                closed = true;
             }
         }
-        return line == null;
     }
     
-    public void close() throws IOException {
-        reader.close();
+    public Instruction getInstructionFromThread(int thread) {
+        while(threads[thread].getInstructions().isEmpty() && !closed) {
+            addInstructionsToThreads(GCASimulator.READING_AMOUNT);
+        }
+        
+        if(threads[thread].getInstructions().isEmpty()) {
+            return null;
+        } else {
+            return threads[thread].getInstructions().removeFirst();
+        }
     }
     
 }
