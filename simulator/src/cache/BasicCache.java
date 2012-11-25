@@ -19,6 +19,10 @@ public class BasicCache extends Cache{
     
     private CacheBlock[][] blocks;
     
+    public BasicCache(int blockCount) {
+        this(blockCount, 1);
+    }
+    
     public BasicCache(int blockCount, int ways) {
         super();
         time = 0;
@@ -53,8 +57,8 @@ public class BasicCache extends Cache{
         int timeSum = 0;
         
         for(int i = 0; i < instr.getAdress().length; i++) {
-            int adress = instr.getAdress()[i];
-            CacheBlock[] set = blocks[adress % blocks.length];
+            long adress = instr.getAdress()[i];
+            CacheBlock[] set = blocks[(int)(adress % ((long)blocks.length))];
             
             int j = 0;
             while(j < set.length && set[j].isUsed() && set[j].getAddress() != adress) {

@@ -12,14 +12,14 @@ public class CacheBlock {
     
     private long timeStamp;
     
-    private int address;
+    private long address;
 
     public CacheBlock() {
         timeStamp = -1;
         address = -1;
     }
 
-    public void setAddress(int address, long timeStamp) {
+    public void setAddress(long address, long timeStamp) {
         this.address = address;
         this.timeStamp = timeStamp;
     }
@@ -28,7 +28,7 @@ public class CacheBlock {
         this.timeStamp = timeStamp;
     }
 
-    public int getAddress() {
+    public long getAddress() {
         return address;
     }
 

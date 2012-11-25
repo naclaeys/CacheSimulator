@@ -12,7 +12,7 @@ import cache.Cache;
  */
 public class MemoryAccess extends Instruction {
 
-    public int[] adress;
+    public long[] adress;
     
     public MemoryAccess(String description) {
         super(description);
@@ -23,13 +23,14 @@ public class MemoryAccess extends Instruction {
             index++;
         }
         
-        adress = new int[index];
+        adress = new long[index];
         for(int i = 0; i < index; i++) {
-            adress[i] = Integer.parseInt(splitDescr[splitDescr.length-1 - i]);
+            // TODO: negatieve adressen?
+            adress[i] = Math.abs(Long.parseLong(splitDescr[splitDescr.length-1 - i]));
         }
     }
 
-    public int[] getAdress() {
+    public long[] getAdress() {
         return adress;
     }
 

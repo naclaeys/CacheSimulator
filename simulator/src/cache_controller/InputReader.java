@@ -34,6 +34,10 @@ public class InputReader {
             threads[i] = new InstructionThread(i);
         }
     }
+
+    public int getThreadCount() {
+        return threads.length;
+    }
     
     private void addInstructionsToThreads() {
         int count = 0;
@@ -47,19 +51,25 @@ public class InputReader {
         while(line != null && count < GCASimulator.READING_AMOUNT) {
             if(line.startsWith("@$")) {
                 String[] parts = line.split(" ");
-                int index = Integer.parseInt(parts[1]);
-                
-                Instruction instr = null;
-                if(parts[2].equals("INS")) {
-                    instr = new NormalInstruction(line);
-                } else if(parts[2].equals("MEM")) {
-                    instr = new MemoryAccess(line);
-                } else {
-                    throw new IllegalArgumentException("Illegal instruction");
+                // TODO: incorrecte instr lijnen?
+                if(parts.length >= 3) {
+                    int index = Integer.parseInt(parts[1]);
+
+                    Instruction instr = null;
+                    switch (parts[2]) {
+                        case "INS":
+                            instr = new NormalInstruction(line);
+                            break;
+                        case "MEM":
+                            instr = new MemoryAccess(line);
+                            break;
+                        default:
+                            throw new IllegalArgumentException("Illegal instruction");
+                    }
+                    threads[index].getInstructions().add(instr);
+
+                    count++;
                 }
-                threads[index].getInstructions().add(instr);
-                
-                count++;
             }
             
             if(count < GCASimulator.READING_AMOUNT) {

@@ -23,6 +23,9 @@ public class CPU {
     private Cache cache;
 
     public CPU(InputReader instructionReader, Cache cache, int threadCount) {
+        if(threadCount != instructionReader.getThreadCount()) {
+            throw new IllegalArgumentException("CPU and instructionreader should have same ThreadCount.");
+        }
         this.cycleCount = 0;
         this.cache = cache;
         this.instructionReader = instructionReader;

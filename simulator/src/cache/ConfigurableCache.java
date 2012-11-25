@@ -30,7 +30,8 @@ public class ConfigurableCache extends Cache implements ChangeListener{
     
     private long instructionNr;
     
-    public ConfigurableCache(File config) {
+    public ConfigurableCache(int blockCount, File config) {
+        this.blockCount = blockCount;
         instructionNr = 0;
         try {
             reader = new BufferedReader(new FileReader(config));
@@ -39,10 +40,8 @@ public class ConfigurableCache extends Cache implements ChangeListener{
         }
         closed = false;
         caches = new HashMap<>();
+        caches.put((long)0, 12);
         
-        cache = new BasicCache(1, 1);
-        
-        setConfig();
         readMore();
     }
     
@@ -50,6 +49,9 @@ public class ConfigurableCache extends Cache implements ChangeListener{
     public long getInstructionTime(MemoryAccess instr) {
         if(caches.containsKey(instructionNr)) {
             cache = new BasicCache(blockCount, caches.get(instructionNr));
+            cache.setCacheHits(getCacheHits());
+            cache.setColdMiss(getColdMiss());
+            cache.setConflictMiss(getConflictMiss());
             cache.addChangeListener(this);
             
             caches.remove(instructionNr);
@@ -65,16 +67,6 @@ public class ConfigurableCache extends Cache implements ChangeListener{
     @Override
     public void clearCacheMemory() {
         cache.clearCacheMemory();
-    }
-    
-    public void setConfig() {
-        String line = null;
-        try {
-            line = reader.readLine();
-            blockCount = Integer.parseInt(line);
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
     }
     
     public void readMore() {

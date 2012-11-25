@@ -72,7 +72,7 @@ public abstract class Cache {
     public abstract long getInstructionTime(MemoryAccess instr) ;
     public abstract void clearCacheMemory();
     
-
+    
     EventListenerList listenerList = new EventListenerList();
     ChangeEvent changeEvent = null;
 

@@ -16,7 +16,7 @@ public class InstructionThread implements Comparable<InstructionThread> {
     private LinkedList<Instruction> instructions;
 
     public InstructionThread(int id) {
-        instructions = new LinkedList<Instruction>();
+        instructions = new LinkedList<>();
         this.id = id;
     }
 
