@@ -21,6 +21,10 @@ public class TwoLayerCache extends Cache {
         this.layer2 = layer2;
     }
     
+    public TwoLayerCache(int blockCount, int ways, Cache layer2) {
+        this(new BasicCache(blockCount, ways), layer2);
+    }
+    
     public TwoLayerCache(int blockCount1, int ways1, int blockCount2, int ways2) {
         this(new BasicCache(blockCount1, ways1), new BasicCache(blockCount2, ways2));
     }

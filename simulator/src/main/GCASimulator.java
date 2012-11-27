@@ -4,6 +4,7 @@
  */
 package main;
 
+import cache.BasicCache;
 import cache.Cache;
 import cache.ConfigurableCache;
 import cache.TwoLayerCache;
@@ -39,13 +40,23 @@ public class GCASimulator {
         }
         
         //Cache c1 = new BasicCache(blockCount);
-        Cache c2 = new TwoLayerCache(100, 1000, 4);
-        CPU cpu = new CPU(input, c2, threadCount);
+        //Cache c2 = new TwoLayerCache(100, 1000, 4);
+        Cache[] c3 = new Cache[threadCount];
+        Cache layer2 = new BasicCache(blockCount, 4);
+        for(int i = 0; i < threadCount; i++) {
+            c3[i] = new TwoLayerCache(blockCount, 4, layer2);
+        }
+        
+        CPU cpu = new CPU(input, c3, threadCount);
         
         cpu.start();
         
+        System.out.println("");
+        
         System.out.println("cyclus count: " + cpu.getCycleCount());
-        c2.printStats();
-        System.out.println("verhouding: " + (double)c2.getCacheHits()/(double)c2.getTotalMisses());
+        for(int i = 0; i < threadCount; i++) {
+            c3[i].printStats();
+            System.out.println("");
+        }
     }
 }
