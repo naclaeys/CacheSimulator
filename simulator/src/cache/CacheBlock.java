@@ -21,7 +21,7 @@ public class CacheBlock {
 
     public void setAddress(long address, long timeStamp) {
         this.address = address;
-        this.timeStamp = timeStamp;
+        setTimeStamp(timeStamp);
     }
 
     public void setTimeStamp(long timeStamp) {

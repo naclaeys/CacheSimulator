@@ -11,9 +11,6 @@ import cache_controller.instruction.MemoryAccess;
  * @author Nathan
  */
 public class BasicCache extends Cache{
-        
-    public static final int HIT_COST = 1;
-    public static final int MISS_COST = 10;
     
     private long time;
     
@@ -51,41 +48,65 @@ public class BasicCache extends Cache{
             j++;
         }
     }
-
+    
     @Override
-    public long getInstructionTime(MemoryAccess instr) {
-        int timeSum = 0;
+    protected boolean isHit(long adress) {
+        CacheBlock[] set = blocks[(int)(adress % ((long)blocks.length))];
         
-        for(int i = 0; i < instr.getAdress().length; i++) {
-            long adress = instr.getAdress()[i];
-            CacheBlock[] set = blocks[(int)(adress % ((long)blocks.length))];
-            
-            int j = 0;
-            while(j < set.length && set[j].isUsed() && set[j].getAddress() != adress) {
-                j++;
-            }
-            
-            if(j < set.length && set[j].getAddress() == adress) {
-                set[j].setTimeStamp(time);
-                addCacheHit();
-                timeSum += HIT_COST;
-            } else {
-                CacheBlock block;
-                if(j == set.length) {
-                    block = selectCacheBlockLRU(set);
-                } else {
-                    block = set[j];
-                }
-                block.setAddress(adress, time);
-                
-                timeSum += MISS_COST;
-                // TODO vervangen door juiste misser
-                addColdMiss();
-            }
+        int j = 0;
+        while(j < set.length && set[j].isUsed() && set[j].getAddress() != adress) {
+            j++;
         }
         
+        return j < set.length && set[j].isUsed();
+    }
+    
+    @Override
+    protected void addAddress(long adress) {
+        CacheBlock[] set = blocks[(int)(adress % ((long)blocks.length))];
+        
+        int j = 0;
+        while(j < set.length && set[j].isUsed() && set[j].getAddress() != adress) {
+            j++;
+        }
+        
+        CacheBlock block;
+        if(j >= set.length) {
+            block = selectCacheBlockLRU(set);
+        } else {
+            block = set[j];
+        }
+        block.setAddress(adress, time);
+    }
+
+    @Override
+    public long getFetchTime(long adress) {
         time++;
-        return timeSum;
+        
+        CacheBlock[] set = blocks[(int)(adress % ((long)blocks.length))];
+
+        int j = 0;
+        while(j < set.length && set[j].isUsed() && set[j].getAddress() != adress) {
+            j++;
+        }
+
+        if(j < set.length && set[j].getAddress() == adress) {
+            set[j].setTimeStamp(time);
+            addCacheHit();
+            return HIT_COST;
+        } else {
+            CacheBlock block;
+            if(j == set.length) {
+                block = selectCacheBlockLRU(set);
+            } else {
+                block = set[j];
+            }
+            block.setAddress(adress, time);
+            
+            // TODO vervangen door juiste misser
+            addColdMiss();
+            return MISS_COST;
+        }
     }
     
     private CacheBlock selectCacheBlockLRU(CacheBlock[] set) {

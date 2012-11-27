@@ -4,11 +4,10 @@
  */
 package main;
 
-import cache.BasicCache;
 import cache.Cache;
 import cache.ConfigurableCache;
+import cache.TwoLayerCache;
 import cache_controller.CPU;
-import cache_controller.InputReader;
 import java.io.File;
 import java.io.IOException;
 
@@ -18,14 +17,12 @@ import java.io.IOException;
  */
 public class GCASimulator {
     
-    public static final int READING_AMOUNT = 1000;
-
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException {
         if(args.length < 3 | args.length > 4) {
-            throw new IllegalArgumentException("Usage: inputFile threadCount blockCount configurationFile");
+            throw new IllegalArgumentException("Usage: inputFile threadCount blockCount <configurationFile>");
         }
         File input = new File(args[0]);
         if(!input.isFile()) {
@@ -41,17 +38,14 @@ public class GCASimulator {
             }
         }
         
-        InputReader reader = new InputReader(input, threadCount);
         //Cache c1 = new BasicCache(blockCount);
-        Cache c2 = new ConfigurableCache(blockCount, configuration);
-        CPU cpu = new CPU(reader, c2, threadCount);
+        Cache c2 = new TwoLayerCache(100, 1000, 4);
+        CPU cpu = new CPU(input, c2, threadCount);
         
         cpu.start();
         
         System.out.println("cyclus count: " + cpu.getCycleCount());
-        System.out.println("cache toegangen: " + (c2.getTotalMisses() + c2.getCacheHits()));
-        System.out.println("cache missers: " + c2.getTotalMisses());
-        System.out.println("cache hits: " + c2.getCacheHits());
+        c2.printStats();
         System.out.println("verhouding: " + (double)c2.getCacheHits()/(double)c2.getTotalMisses());
     }
 }

@@ -36,7 +36,13 @@ public class MemoryAccess extends Instruction {
 
     @Override
     public long getExecutionTime(Cache cache) {
-        return cache.getInstructionTime(this);
+        long time = 0;
+        
+        for(int i = 0; i < adress.length; i++) {
+            time = Math.max(cache.getFetchTime(adress[i]), time);
+        }
+        
+        return time;
     }
     
 }
