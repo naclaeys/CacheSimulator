@@ -14,19 +14,13 @@ public class MemoryAccess extends Instruction {
 
     public long[] adress;
     
-    public MemoryAccess(String description) {
-        super(description);
+    public MemoryAccess(String description, long instructionAdress) {
+        super(description, instructionAdress);
         
-        String[] splitDescr = description.split(" ");
-        int index = 0;
-        while(!splitDescr[splitDescr.length-1 - index].equals("MEM")) {
-            index++;
-        }
-        
-        adress = new long[index];
-        for(int i = 0; i < index; i++) {
-            // TODO: negatieve adressen?
-            adress[i] = Math.abs(Long.parseLong(splitDescr[splitDescr.length-1 - i]));
+        String[] splitDescr = description.split(" ");        
+        adress = new long[splitDescr.length - 3];
+        for(int i = 0; i < adress.length; i++) {
+            adress[i] = Long.parseLong(splitDescr[i + 3]);
         }
     }
 

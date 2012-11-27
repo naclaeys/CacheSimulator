@@ -15,12 +15,19 @@ public abstract class Instruction {
     // description van instructie in trace file
     private String description;
     
-    public Instruction(String description) {
+    private long instructionAdress;
+    
+    public Instruction(String description, long instructionAdress) {
         this.description = description;
+        this.instructionAdress = instructionAdress;
     }
 
     public String getDescription() {
         return description;
+    }
+
+    public long getInstructionAdress() {
+        return instructionAdress;
     }
     
     public abstract long getExecutionTime(Cache cache);
