@@ -12,20 +12,20 @@ import inputreader.InstructionInputFileReader;
  */
 public class InstructionThread {
     
-    private int id;
+    private long id;
     private InstructionInputFileReader reader;
     
     private Instruction instruction;
     private long waitingTime;
     
-    public InstructionThread(int id, InstructionInputFileReader reader) {
+    public InstructionThread(long id, InstructionInputFileReader reader) {
         this.id = id;
         this.reader = reader;
         instruction = reader.getInstructionFromThread(id);
         waitingTime = 0;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
@@ -43,7 +43,9 @@ public class InstructionThread {
     }
     
     public void decreaseWaitingTime() {
-        waitingTime--;
+        if(waitingTime > 0) {
+            waitingTime--;
+        }
     }
 
     public long getWaitingTime() {

@@ -15,10 +15,10 @@ public abstract class Instruction {
     // description van instructie in trace file
     private String description;
     
-    private int thread;
+    private long thread;
     private long instructionAdress;
     
-    public Instruction(String description, int thread, long instructionAdress) {
+    public Instruction(String description, long thread, long instructionAdress) {
         this.description = description;
         this.thread = thread;
         this.instructionAdress = instructionAdress;
@@ -28,7 +28,7 @@ public abstract class Instruction {
         return description;
     }
 
-    public int getThread() {
+    public long getThread() {
         return thread;
     }
 

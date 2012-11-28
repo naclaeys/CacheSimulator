@@ -8,6 +8,8 @@ import cache.BasicCache;
 import cache.Cache;
 import cache.TwoLayerCache;
 import cache_controller.CPU;
+import cache_controller.instruction.Instruction;
+import inputreader.InstructionInputFileReader;
 import java.io.File;
 import java.io.IOException;
 
@@ -48,6 +50,8 @@ public class GCASimulator {
         
         CPU cpu = new CPU(input, c3);
         
+        Instruction first = new InstructionInputFileReader(input, cpu).getInstruction();
+        cpu.addThread(first.getThread());
         cpu.start();
         
         System.out.println("");

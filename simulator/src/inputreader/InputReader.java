@@ -12,6 +12,6 @@ import cache_controller.instruction.Instruction;
  */
 public interface InputReader {
     
-    public Instruction getInstructionFromThread(int thread);
+    public Instruction getInstructionFromThread(long thread);
     
 }

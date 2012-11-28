@@ -36,40 +36,11 @@ public class InstructionInputFileReader implements InputReader {
         this.cpu = cpu;
     }
     
-    /**
-     * valid: "@$ <threadid> : <instructionaddress> <type: MEM/INS> <memaddr1> <memaddr2> ... <memaddrn>"
-     * @param line
-     * @return 
-    private boolean isLineValid(String line) {
-        boolean valid = false;
-        if(line.startsWith("@I") || line.startsWith("@M")) {
-            String[] parts = line.split(" ");
-            valid = parts.length >= 3;
-            
-            if(valid) {
-                try {
-                    for(int i = 0; i < parts.length; i++) {
-                        valid &= Long.parseLong(parts[i]) >= 0;
-                    }
-                } catch(NumberFormatException ex) {
-                    valid = false;
-                }
-            }
-            
-            // hoort valid te zijn
-            if(!valid) {
-                System.err.println("" + line);
-            }
-        }
-        
-        return valid;
-    }*/
-    
     private Instruction createInstruction(String line) {
         Instruction instr;
         String[] parts = line.split(" ");
         
-        int thread = Integer.parseInt(parts[1]);
+        long thread = Long.parseLong(parts[1]);
         long instructionAdress = Long.parseLong(parts[2]);
         switch (parts[0]) {
             case "@I":
@@ -102,7 +73,7 @@ public class InstructionInputFileReader implements InputReader {
                         instr = createInstruction(line);
                     } catch(Exception ex) {
                         valid = false;
-                        System.err.println("" + line);
+                        //System.err.println("" + line);
                     }
                 }
             } catch (IOException ex) {
@@ -115,7 +86,7 @@ public class InstructionInputFileReader implements InputReader {
     }
     
     @Override
-    public Instruction getInstructionFromThread(int thread) {
+    public Instruction getInstructionFromThread(long thread) {
         if(closed) {
             return null;
         }

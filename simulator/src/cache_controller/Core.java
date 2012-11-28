@@ -69,7 +69,7 @@ public class Core {
         }        
     }
     
-    public void addThread(int thread, InstructionInputFileReader reader) {
+    public void addThread(long thread, InstructionInputFileReader reader) {
         threads.addFirst(new InstructionThread(thread, reader));
     }
     
@@ -77,10 +77,14 @@ public class Core {
         return threads.size();
     }
     
-    public void print(int id) {
-        //System.out.println("" + id + " " + instruction.getInstructionAdress());
-        System.out.println("" + id + " " + (cache.getTotalMisses() - previousCacheMiss));
-        System.out.println("" + id + " " + (cache.getCacheHits() - previousCacheHits));
+    public void print(long id) {
+        long missDiff = cache.getTotalMisses() - previousCacheMiss;
+        long hitDiff = cache.getCacheHits() - previousCacheHits;
+        if(missDiff != 0 || hitDiff != 0) {
+            //System.out.println("" + id + " " + instruction.getInstructionAdress());
+            System.out.println("" + id + " " + missDiff);
+            System.out.println("" + id + " " + hitDiff);
+        }
         
         previousCacheMiss = cache.getTotalMisses();
         previousCacheHits = cache.getCacheHits();

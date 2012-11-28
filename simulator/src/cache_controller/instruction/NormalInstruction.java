@@ -12,7 +12,7 @@ import cache.Cache;
  */
 public class NormalInstruction extends Instruction {
 
-    public NormalInstruction(String description, int thread, long instructionAdress) {
+    public NormalInstruction(String description, long thread, long instructionAdress) {
         super(description, thread, instructionAdress);
     }
 

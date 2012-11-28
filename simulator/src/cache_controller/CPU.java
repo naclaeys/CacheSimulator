@@ -5,7 +5,6 @@
 package cache_controller;
 
 import cache.Cache;
-import cache_controller.instruction.Instruction;
 import inputreader.InstructionInputFileReader;
 import java.io.File;
 import java.util.HashSet;
@@ -16,14 +15,14 @@ import java.util.HashSet;
  */
 public class CPU {
     
-    public static final long JUMP = 50;
+    public static final long JUMP = 500;
     
     private long cycleCount;
     
     private File input;
     
     private Core[] cores;
-    private HashSet<Integer> threadsDiscovered;
+    private HashSet<Long> threadsDiscovered;
     
     public CPU(File input, Cache[] caches) {
         this.cycleCount = 0;
@@ -40,7 +39,7 @@ public class CPU {
         return cycleCount;
     }
     
-    public void addThread(int thread) {
+    public void addThread(long thread) {
         if(!threadsDiscovered.contains(thread)) {
             threadsDiscovered.add(thread);
             
@@ -66,7 +65,7 @@ public class CPU {
                 if(cores[i].getThreadCount() > 0) {
                     cores[i].execute();
                 }
-                done &= cores[i].getThreadCount() > 0;
+                done &= cores[i].getThreadCount() == 0;
             }
             
             cycleCount++;

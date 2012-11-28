@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import main.GCASimulator;
 
 /**
  *
