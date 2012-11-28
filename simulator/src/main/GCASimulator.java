@@ -6,7 +6,6 @@ package main;
 
 import cache.BasicCache;
 import cache.Cache;
-import cache.ConfigurableCache;
 import cache.TwoLayerCache;
 import cache_controller.CPU;
 import java.io.File;
@@ -29,7 +28,7 @@ public class GCASimulator {
         if(!input.isFile()) {
             throw new IllegalArgumentException("File not found: " + args[0]);
         }
-        int threadCount = Integer.parseInt(args[1]);
+        int coreCount = Integer.parseInt(args[1]);
         int blockCount = Integer.parseInt(args[2]);
         File configuration = null;
         if(args.length == 4) {
@@ -41,20 +40,20 @@ public class GCASimulator {
         
         //Cache c1 = new BasicCache(blockCount);
         //Cache c2 = new TwoLayerCache(100, 1000, 4);
-        Cache[] c3 = new Cache[threadCount];
+        Cache[] c3 = new Cache[coreCount];
         Cache layer2 = new BasicCache(blockCount, 4);
-        for(int i = 0; i < threadCount; i++) {
+        for(int i = 0; i < coreCount; i++) {
             c3[i] = new TwoLayerCache(blockCount, 4, layer2);
         }
         
-        CPU cpu = new CPU(input, c3, threadCount);
+        CPU cpu = new CPU(input, c3);
         
         cpu.start();
         
         System.out.println("");
         
         System.out.println("cyclus count: " + cpu.getCycleCount());
-        for(int i = 0; i < threadCount; i++) {
+        for(int i = 0; i < coreCount; i++) {
             c3[i].printStats();
             System.out.println("");
         }

@@ -12,8 +12,8 @@ import cache.Cache;
  */
 public class NormalInstruction extends Instruction {
 
-    public NormalInstruction(String description, long instructionAdress) {
-        super(description, instructionAdress);
+    public NormalInstruction(String description, int thread, long instructionAdress) {
+        super(description, thread, instructionAdress);
     }
 
     @Override

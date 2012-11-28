@@ -15,15 +15,21 @@ public abstract class Instruction {
     // description van instructie in trace file
     private String description;
     
+    private int thread;
     private long instructionAdress;
     
-    public Instruction(String description, long instructionAdress) {
+    public Instruction(String description, int thread, long instructionAdress) {
         this.description = description;
+        this.thread = thread;
         this.instructionAdress = instructionAdress;
     }
 
     public String getDescription() {
         return description;
+    }
+
+    public int getThread() {
+        return thread;
     }
 
     public long getInstructionAdress() {

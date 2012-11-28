@@ -6,7 +6,9 @@ package cache_controller;
 
 import cache.Cache;
 import cache_controller.instruction.Instruction;
+import inputreader.InstructionInputFileReader;
 import java.io.File;
+import java.util.HashSet;
 
 /**
  *
@@ -17,70 +19,62 @@ public class CPU {
     public static final long JUMP = 50;
     
     private long cycleCount;
-
-    private int threadCount;
-    private InputReader[] instructionReader;
-    private long[] waiting;
-    private boolean[] finished;
     
-    private Cache[] caches;
-
-    public CPU(File input, Cache[] caches, int threadCount) {
+    private File input;
+    
+    private Core[] cores;
+    private HashSet<Integer> threadsDiscovered;
+    
+    public CPU(File input, Cache[] caches) {
         this.cycleCount = 0;
-        this.caches = caches;
+        this.input = input;
         
-        this.threadCount = threadCount;
-        this.instructionReader = new InstructionInputFileReader[threadCount];
-        this.waiting = new long[threadCount];
-        this.finished = new boolean[threadCount];
-        for(int i = 0; i < threadCount; i++) {
-            instructionReader[i] = new InstructionInputFileReader(input);
-            waiting[i] = 0;
-            finished[i] = false;
+        this.cores = new Core[caches.length];
+        for(int i = 0; i < cores.length; i++) {
+            cores[i] = new Core(caches[i]);
         }
+        threadsDiscovered = new HashSet<>();
     }
 
     public long getCycleCount() {
         return cycleCount;
     }
+    
+    public void addThread(int thread) {
+        if(!threadsDiscovered.contains(thread)) {
+            threadsDiscovered.add(thread);
+            
+            int min = 0;
+            for(int i = 1; i < cores.length; i++) {
+                if(cores[i].getThreadCount() < cores[min].getThreadCount()) {
+                    min = i;
+                }
+            }
+            cores[min].addThread(thread, new InstructionInputFileReader(input, this));
+        }
+    }
 
     public void start() {
         boolean done = false;
         long jumpIndex = 0;
-        long previousCacheMiss[] = new long[threadCount];
-        long previousCacheHits[] = new long[threadCount];
-        Instruction[] instructions = new Instruction[threadCount];
         
         // cyclus
         while(!done) {
             done = true;
             
-            for(int i = 0; i < threadCount; i++) {
-                if(!finished[i] && waiting[i] <= 0) {
-                    instructions[i] = instructionReader[i].getInstructionFromThread(i);
-                    
-                    finished[i] = instructions[i] == null;
-                    if(!finished[i]) {
-                        waiting[i] += instructions[i].getExecutionTime(caches[i]);
-                    }
+            for(int i = 0; i < cores.length; i++) {
+                if(cores[i].getThreadCount() > 0) {
+                    cores[i].execute();
                 }
-                waiting[i]--;
-                done &= finished[i] && waiting[i] <= 0;
+                done &= cores[i].getThreadCount() > 0;
             }
             
             cycleCount++;
             jumpIndex ++;
             if(jumpIndex == JUMP) {
                 jumpIndex = 0;
-                
-                for(int i = 0; i < threadCount; i++) {
-                    previousCacheMiss[i] = caches[i].getTotalMisses();
-                    previousCacheHits[i] = caches[i].getCacheHits();
-                    
-                    System.out.println("" + i + " " + instructions[i].getInstructionAdress());
-                    System.out.println("" + i + " " + (caches[i].getTotalMisses() - previousCacheMiss[i]));
-                    System.out.println("" + i + " " + (caches[i].getCacheHits() - previousCacheHits[i]));
-                    
+                for(int i = 0; i < cores.length; i++) {
+                    cores[i].print(i);
                 }
             }
         }

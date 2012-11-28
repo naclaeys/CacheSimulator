@@ -4,43 +4,50 @@
  */
 package cache_controller.instruction;
 
-import java.util.LinkedList;
+import inputreader.InstructionInputFileReader;
 
 /**
  *
  * @author naclaeys
  */
-public class InstructionThread implements Comparable<InstructionThread> {
+public class InstructionThread {
     
     private int id;
-    private LinkedList<Instruction> instructions;
-
-    public InstructionThread(int id) {
-        instructions = new LinkedList<>();
+    private InstructionInputFileReader reader;
+    
+    private Instruction instruction;
+    private long waitingTime;
+    
+    public InstructionThread(int id, InstructionInputFileReader reader) {
         this.id = id;
+        this.reader = reader;
+        instruction = reader.getInstructionFromThread(id);
+        waitingTime = 0;
     }
 
     public int getId() {
         return id;
     }
 
-    public LinkedList<Instruction> getInstructions() {
-        return instructions;
+    public Instruction setNextInstruction() {
+        instruction = reader.getInstructionFromThread(id);;
+        return instruction;
     }
 
-    public void setInstructions(LinkedList<Instruction> instructions) {
-        this.instructions = instructions;
+    public Instruction getInstruction() {
+        return instruction;
     }
 
-    @Override
-    public int compareTo(InstructionThread o) {
-        if(id < o.getId()) {
-            return -1;
-        } else if(id == o.getId()) {
-            return 0;
-        } else {
-            return 1;
-        }
+    public void setWaitingTime(long waitingTime) {
+        this.waitingTime = waitingTime;
+    }
+    
+    public void decreaseWaitingTime() {
+        waitingTime--;
+    }
+
+    public long getWaitingTime() {
+        return waitingTime;
     }
     
 }

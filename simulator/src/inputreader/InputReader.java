@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package cache_controller;
+package inputreader;
 
 import cache_controller.instruction.Instruction;
 

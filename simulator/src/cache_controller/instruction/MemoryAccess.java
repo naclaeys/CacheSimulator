@@ -14,8 +14,8 @@ public class MemoryAccess extends Instruction {
 
     public long[] adress;
     
-    public MemoryAccess(String description, long instructionAdress) {
-        super(description, instructionAdress);
+    public MemoryAccess(String description, int thread, long instructionAdress) {
+        super(description, thread, instructionAdress);
         
         String[] splitDescr = description.split(" ");        
         adress = new long[splitDescr.length - 3];

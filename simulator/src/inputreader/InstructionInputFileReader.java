@@ -2,8 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package cache_controller;
+package inputreader;
 
+import cache_controller.CPU;
 import cache_controller.instruction.Instruction;
 import cache_controller.instruction.MemoryAccess;
 import cache_controller.instruction.NormalInstruction;
@@ -22,20 +23,23 @@ public class InstructionInputFileReader implements InputReader {
     private BufferedReader reader;
     private boolean closed;
     
-    public InstructionInputFileReader(File input) {
+    private CPU cpu;
+    
+    public InstructionInputFileReader(File input, CPU cpu) {
         try {
             reader = new BufferedReader(new FileReader(input));
         } catch (FileNotFoundException ex) {
             throw new RuntimeException(ex);
         }
         closed = false;
+        
+        this.cpu = cpu;
     }
     
     /**
      * valid: "@$ <threadid> : <instructionaddress> <type: MEM/INS> <memaddr1> <memaddr2> ... <memaddrn>"
      * @param line
      * @return 
-     */
     private boolean isLineValid(String line) {
         boolean valid = false;
         if(line.startsWith("@I") || line.startsWith("@M")) {
@@ -59,25 +63,55 @@ public class InstructionInputFileReader implements InputReader {
         }
         
         return valid;
+    }*/
+    
+    private Instruction createInstruction(String line) {
+        Instruction instr;
+        String[] parts = line.split(" ");
+        
+        int thread = Integer.parseInt(parts[1]);
+        long instructionAdress = Long.parseLong(parts[2]);
+        switch (parts[0]) {
+            case "@I":
+                instr = new NormalInstruction(line, thread, instructionAdress);
+                break;
+            case "@M":
+                instr = new MemoryAccess(line, thread, instructionAdress);
+                break;
+            default:
+                throw new IllegalArgumentException("Illegal instruction");
+        }
+        
+        return instr;
     }
     
     /**
      * haal valid instruction line op
      * @return 
      */
-    public String getLine() {
-        String line = null;
+    public Instruction getInstruction() {
+        Instruction instr = null;
+        boolean valid = true;
+        String line;
         
         do {
             try {
                 line = reader.readLine();
+                if(line != null) {
+                    try {
+                        instr = createInstruction(line);
+                    } catch(Exception ex) {
+                        valid = false;
+                        System.err.println("" + line);
+                    }
+                }
             } catch (IOException ex) {
                 ex.printStackTrace();
                 throw new RuntimeException(ex);
             }
-        } while(line != null && !isLineValid(line));
+        } while(line != null && !valid);
         
-        return line;
+        return instr;
     }
     
     @Override
@@ -86,16 +120,14 @@ public class InstructionInputFileReader implements InputReader {
             return null;
         }
         
-        String line = null;
+        Instruction instr = null;
         String[] parts = null;
         do{
-            line = getLine();
-            if(line != null) {
-                parts = line.split(" ");
-            }
-        } while(line != null && Integer.parseInt(parts[1]) != thread);
+            instr = getInstruction();
+            cpu.addThread(instr.getThread());
+        } while(instr != null && instr.getThread() != thread);
         
-        if(line == null) {
+        if(instr == null) {
             try {
                 reader.close();
             } catch (IOException ex) {
@@ -106,18 +138,6 @@ public class InstructionInputFileReader implements InputReader {
             }
         }
         
-        Instruction instr = null;
-        long instructionAdress = Long.parseLong(parts[2]);
-        switch (parts[0]) {
-            case "@I":
-                instr = new NormalInstruction(line, instructionAdress);
-                break;
-            case "@M":
-                instr = new MemoryAccess(line, instructionAdress);
-                break;
-            default:
-                throw new IllegalArgumentException("Illegal instruction");
-        }
         return instr;
     }
 }

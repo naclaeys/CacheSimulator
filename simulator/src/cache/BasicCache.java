@@ -4,8 +4,6 @@
  */
 package cache;
 
-import cache_controller.instruction.MemoryAccess;
-
 /**
  *
  * @author Nathan
