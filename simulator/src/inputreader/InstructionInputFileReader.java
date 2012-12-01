@@ -100,9 +100,6 @@ public class InstructionInputFileReader implements InputReader {
                         valid = false;
                         System.err.println("" + line);
                     }
-                    if(valid) {
-                        cpu.addThread(instr.getThread(), lineNumber-1);
-                    }
                 }
             } catch (IOException ex) {
                 ex.printStackTrace();
@@ -122,6 +119,9 @@ public class InstructionInputFileReader implements InputReader {
         Instruction instr = null;
         do{
             instr = getInstruction();
+            if(instr != null) {
+                cpu.addThread(instr.getThread(), lineNumber-1);
+            }
         } while(instr != null && instr.getThread() != thread);
         
         if(instr == null) {
