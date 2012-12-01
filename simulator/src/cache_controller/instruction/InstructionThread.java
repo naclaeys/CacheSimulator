@@ -21,7 +21,7 @@ public class InstructionThread {
     public InstructionThread(long id, InstructionInputFileReader reader) {
         this.id = id;
         this.reader = reader;
-        instruction = reader.getInstructionFromThread(id);
+        instruction = null;
         waitingTime = 0;
     }
 
@@ -30,7 +30,7 @@ public class InstructionThread {
     }
 
     public Instruction setNextInstruction() {
-        instruction = reader.getInstructionFromThread(id);;
+        instruction = reader.getInstructionFromThread(id);
         return instruction;
     }
 

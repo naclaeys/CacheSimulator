@@ -35,6 +35,10 @@ public class InstructionInputFileReader implements InputReader {
         
         this.cpu = cpu;
     }
+
+    public BufferedReader getReader() {
+        return reader;
+    }
     
     private Instruction createInstruction(String line) {
         Instruction instr;

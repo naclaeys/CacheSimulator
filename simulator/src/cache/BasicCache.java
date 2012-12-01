@@ -22,7 +22,6 @@ public class BasicCache extends Cache {
     
     private int ways;
     private ArrayList<HashMap<Address, CacheBlock>> blocks;
-    private CacheBlock[][] cacheBlocks;
     // aantal adressen dat voorkomt in 1 cache block (grootte van de cache lijn)
     private int blockSize;
     
@@ -33,34 +32,11 @@ public class BasicCache extends Cache {
         this.missCost = missCost;
         
         this.ways = ways;
+        this.blockSize = blockSize;
         int size = (blockCount+ways-1)/ways;
         blocks = new ArrayList<>(size);
         for(int i = 0; i < size; i++) {
             blocks.add(new HashMap<Address, CacheBlock>((int)(ways/0.75)+1));
-        }
-        cacheBlocks = new CacheBlock[size][ways];
-        this.blockSize = blockSize;
-        
-        int count = 0;
-        int i = 0;
-        int j = 0;
-        while(i < cacheBlocks.length && count < blockCount) {
-            j = 0;
-            while(j < cacheBlocks[i].length && count < blockCount) {
-                cacheBlocks[i][j] = new CacheBlock();
-                count++;
-                j++;
-            }
-            if(count < blockCount) {
-                i++;
-            }
-        }
-        
-        int k = 0;
-        while(j < cacheBlocks[i].length) {
-            cacheBlocks[i][j] = cacheBlocks[0][k];
-            k++;
-            j++;
         }
     }
 
@@ -102,11 +78,12 @@ public class BasicCache extends Cache {
             CacheBlock block;
             if(map.size() == ways) {
                 block = selectCacheBlockLRU(map);
+                map.remove(block.getAddress());
             } else {
                 block = new CacheBlock();
-                map.put(cacheAddress, block);
             }
             block.setAddress(cacheAddress, time);
+            map.put(cacheAddress, block);
             
             // TODO vervangen door juiste misser
             addColdMiss();
@@ -127,10 +104,8 @@ public class BasicCache extends Cache {
 
     @Override
     public void clearCacheMemory() {
-        for(int i = 0; i < cacheBlocks.length; i++) {
-            for(int j = 0; j < cacheBlocks[i].length; j++) {
-                cacheBlocks[i][j].clear();
-            }
+        for(HashMap map: blocks) {
+            map.clear();
         }
     }
     

@@ -8,6 +8,7 @@ import cache.Cache;
 import cache_controller.instruction.Instruction;
 import cache_controller.instruction.InstructionThread;
 import inputreader.InstructionInputFileReader;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 /**
@@ -21,6 +22,7 @@ public class Core {
     private long previousCacheMiss;
     private long previousCacheHits;
     
+    private int index;
     private LinkedList<InstructionThread> threads;
     
     public Core(Cache cache) {
@@ -29,11 +31,28 @@ public class Core {
         previousCacheMiss = 0;
         previousCacheHits = 0;
         
+        index = 0;
         threads = new LinkedList<>();
+    }
+    
+    private void increaseIndex() {
+        index++;
+        if(index > threads.size()) {
+            index = 0;
+        }
     }
     
     private InstructionThread getExecutingThread() {
         InstructionThread chosenThread = null;
+        
+        Iterator<InstructionThread> it = threads.listIterator(index);
+        while(it.hasNext() && chosenThread == null) {
+            increaseIndex();
+            InstructionThread thread = it.next();
+            if(thread.getWaitingTime() == 0) {
+                chosenThread = thread;
+            }
+        }
         
         InstructionThread thread = null;
         for(int i = 0; i < getThreadCount(); i++) {
@@ -59,6 +78,10 @@ public class Core {
     
     public void execute() {
         if(!threads.isEmpty()) {
+            for(InstructionThread thread: threads) {
+                thread.decreaseWaitingTime();
+            }
+            
             InstructionThread thread = getExecutingThread();
             
             if(thread != null) {
@@ -75,7 +98,7 @@ public class Core {
     }
     
     public void addThread(long thread, InstructionInputFileReader reader) {
-        threads.addFirst(new InstructionThread(thread, reader));
+        threads.add(index, new InstructionThread(thread, reader));
     }
     
     public int getThreadCount() {
