@@ -39,7 +39,7 @@ public class CPU {
         return cycleCount;
     }
     
-    public void addThread(long thread) {
+    public void addThread(long thread, long lineNumber) {
         if(!threadsDiscovered.contains(thread)) {
             threadsDiscovered.add(thread);
             
@@ -49,7 +49,7 @@ public class CPU {
                     min = i;
                 }
             }
-            cores[min].addThread(thread, new InstructionInputFileReader(input, this));
+            cores[min].addThread(thread, new InstructionInputFileReader(input, this, lineNumber));
         }
     }
 

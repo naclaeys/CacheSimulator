@@ -41,7 +41,7 @@ public class TracePreparation {
         }
         output.createNewFile();
         
-        InstructionInputFileReader reader = new InstructionInputFileReader(input, null);
+        InstructionInputFileReader reader = new InstructionInputFileReader(input, null, 0);
         BufferedWriter writer = new BufferedWriter(new FileWriter(output));
         
         Instruction instr = reader.getInstruction();

@@ -46,31 +46,24 @@ public class Core {
         InstructionThread chosenThread = null;
         
         Iterator<InstructionThread> it = threads.listIterator(index);
+        int count = 0;
         while(it.hasNext() && chosenThread == null) {
             increaseIndex();
+            count++;
             InstructionThread thread = it.next();
             if(thread.getWaitingTime() == 0) {
                 chosenThread = thread;
             }
         }
-        
-        InstructionThread thread = null;
-        for(int i = 0; i < getThreadCount(); i++) {
-            thread = threads.pop();
-            threads.addLast(thread);
-
-            thread.decreaseWaitingTime();
-            if(thread.getWaitingTime() == 0 && chosenThread == null) {
-                chosenThread = thread;
+        if(chosenThread == null && count < threads.size()) {
+            it = threads.listIterator(index);
+            while(it.hasNext() && chosenThread == null) {
+                increaseIndex();
+                InstructionThread thread = it.next();
+                if(thread.getWaitingTime() == 0) {
+                    chosenThread = thread;
+                }
             }
-        }
-        
-        if(chosenThread != null) {
-            // zet volgende thread keuze klaar, de thread vlak na degene die nu gekozen is
-            do {
-                thread = threads.pop();
-                threads.addLast(thread);
-            } while(thread.getId() != chosenThread.getId());
         }
         
         return chosenThread;

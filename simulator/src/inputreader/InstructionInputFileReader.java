@@ -21,19 +21,33 @@ import java.io.IOException;
 public class InstructionInputFileReader implements InputReader {
     
     private BufferedReader reader;
+    private long lineNumber;
     private boolean closed;
     
     private CPU cpu;
     
-    public InstructionInputFileReader(File input, CPU cpu) {
+    public InstructionInputFileReader(File input, CPU cpu, long lineNumber) {
         try {
             reader = new BufferedReader(new FileReader(input));
         } catch (FileNotFoundException ex) {
             throw new RuntimeException(ex);
         }
+        this.lineNumber = 0;
+        skipToLine(lineNumber);
         closed = false;
         
         this.cpu = cpu;
+    }
+    
+    private void skipToLine(long lineNumber) {
+        while(this.lineNumber < lineNumber) {
+            try {
+                reader.readLine();
+                this.lineNumber++;
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
     }
 
     public BufferedReader getReader() {
@@ -77,6 +91,7 @@ public class InstructionInputFileReader implements InputReader {
         do {
             try {
                 line = reader.readLine();
+                lineNumber++;
                 if(line != null) {
                     try {
                         instr = createInstruction(line);
@@ -84,6 +99,9 @@ public class InstructionInputFileReader implements InputReader {
                     } catch(Exception ex) {
                         valid = false;
                         System.err.println("" + line);
+                    }
+                    if(valid) {
+                        cpu.addThread(instr.getThread(), lineNumber-1);
                     }
                 }
             } catch (IOException ex) {
@@ -104,9 +122,6 @@ public class InstructionInputFileReader implements InputReader {
         Instruction instr = null;
         do{
             instr = getInstruction();
-            if(instr != null) {
-                cpu.addThread(instr.getThread());
-            }
         } while(instr != null && instr.getThread() != thread);
         
         if(instr == null) {
