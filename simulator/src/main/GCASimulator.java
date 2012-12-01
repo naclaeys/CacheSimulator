@@ -20,6 +20,7 @@ import java.io.IOException;
 public class GCASimulator {
     
     public static final long HIT_COST_LAYER1 = 1;
+    // nooit gebruikt eigenlijk, miss cost layer1 == (hit cost layer2 || miss cost layer2)
     public static final long MISS_COST_LAYER1 = 10;
     public static final long HIT_COST_LAYER2 = 10;
     public static final long MISS_COST_LAYER2 = 100;

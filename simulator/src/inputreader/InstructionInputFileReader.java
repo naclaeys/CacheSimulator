@@ -40,7 +40,7 @@ public class InstructionInputFileReader implements InputReader {
         Instruction instr;
         String[] parts = line.split(" ");
         
-        long thread = Long.parseLong(parts[2]);
+        long thread = Long.parseLong(parts[2]); //TODO (eigenlijk fout, maar voorlopig betere optie)
         switch (parts[0]) {
             case "@I":
                 instr = new NormalInstruction(line, thread, parts[1]);
@@ -73,7 +73,7 @@ public class InstructionInputFileReader implements InputReader {
                         valid = true;
                     } catch(Exception ex) {
                         valid = false;
-                        //System.err.println("" + line);
+                        System.err.println("" + line);
                     }
                 }
             } catch (IOException ex) {
@@ -92,7 +92,6 @@ public class InstructionInputFileReader implements InputReader {
         }
         
         Instruction instr = null;
-        String[] parts = null;
         do{
             instr = getInstruction();
             if(instr != null) {

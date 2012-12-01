@@ -5,7 +5,6 @@
 package cache_controller.instruction;
 
 import java.math.BigInteger;
-import java.util.Objects;
 
 /**
  *
@@ -17,6 +16,9 @@ public class Address {
     
     public Address(String address) {
         this.address = new BigInteger(address);
+        if(this.address.signum() == -1) {
+            throw new IllegalArgumentException("address can not be negative");
+        }
     }
 
     public long modOf(long mod) {
