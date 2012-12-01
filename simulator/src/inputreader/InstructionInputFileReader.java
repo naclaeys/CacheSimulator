@@ -40,19 +40,19 @@ public class InstructionInputFileReader implements InputReader {
         Instruction instr;
         String[] parts = line.split(" ");
         
-        long thread = Long.parseLong(parts[2]); //TODO (eigenlijk fout, maar voorlopig betere optie)
+        long thread = Long.parseLong(parts[1]);
         switch (parts[0]) {
             case "@I":
                 if(parts.length == 3) {
-                    instr = new NormalInstruction(line, thread, parts[1]); //TODO (eigenlijk fout, maar voorlopig betere optie)
+                    instr = new NormalInstruction(line, thread, parts[2]);
                 } else if(parts.length == 4) {
-                    instr = new NormalInstruction(line, thread, parts[1], Long.parseLong(parts[3])); //TODO (eigenlijk fout, maar voorlopig betere optie)
+                    instr = new NormalInstruction(line, thread, parts[2], Long.parseLong(parts[3]));
                 } else {
                     throw new IllegalArgumentException("Illegal instruction");
                 }
                 break;
             case "@M":
-                instr = new MemoryAccess(line, thread, parts[1]);
+                instr = new MemoryAccess(line, thread, parts[2]);
                 break;
             default:
                 throw new IllegalArgumentException("Illegal instruction");

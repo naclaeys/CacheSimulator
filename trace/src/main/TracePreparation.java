@@ -32,8 +32,7 @@ public class TracePreparation {
         if(!input.isFile()) {
             throw new IllegalArgumentException("File not found: " + args[0]);
         }
-        File output = null;
-        output = new File(args[args.length - 1]);
+        File output = new File(args[args.length - 1]);
         if(output.exists() && !output.isFile()) {
             throw new IllegalArgumentException("File not found: " + args[1]);
         }
@@ -61,7 +60,7 @@ public class TracePreparation {
                 
                 Collections.sort(addressList);
                 Address instrAddress = addressList.get(addressList.size()/2);
-                String description = "@I " + instrAddress.toString() + " " + threadId + " " + counting; //TODO (eigenlijk fout, maar voorlopig betere optie)
+                String description = "@I " + threadId + " " + instrAddress.toString() + " " + counting;
                 writer.write(description);
                 writer.newLine();
             }
