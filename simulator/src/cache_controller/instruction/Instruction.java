@@ -32,8 +32,8 @@ public abstract class Instruction {
         return thread;
     }
 
-    public String getInstructionAdress() {
-        return instructionAdress.toString();
+    public Address getInstructionAdress() {
+        return instructionAdress;
     }
     
     public abstract long getExecutionTime(Cache cache);

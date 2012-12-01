@@ -12,13 +12,20 @@ import cache.Cache;
  */
 public class NormalInstruction extends Instruction {
 
+    private long amount;
+    
     public NormalInstruction(String description, long thread, String instructionAdress) {
-        super(description, thread, instructionAdress);
+        this(description, thread, instructionAdress, 1);
     }
-
+    
+    public NormalInstruction(String description, long thread, String instructionAdress, long amount) {
+        super(description, thread, instructionAdress);
+        this.amount = amount;
+    }
+    
     @Override
     public long getExecutionTime(Cache cache) {
-        return 1;
+        return amount;
     }
     
 }

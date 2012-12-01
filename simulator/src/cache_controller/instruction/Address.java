@@ -10,7 +10,7 @@ import java.math.BigInteger;
  *
  * @author Nathan
  */
-public class Address {
+public class Address implements Comparable<Address> {
 
     private BigInteger address;
     
@@ -19,6 +19,10 @@ public class Address {
         if(this.address.signum() == -1) {
             throw new IllegalArgumentException("address can not be negative");
         }
+    }
+
+    public BigInteger getAddress() {
+        return address;
     }
 
     public long modOf(long mod) {
@@ -45,6 +49,11 @@ public class Address {
     @Override
     public int hashCode() {
         return address.hashCode();
+    }
+
+    @Override
+    public int compareTo(Address o) {
+        return address.compareTo(o.getAddress());
     }
     
 }

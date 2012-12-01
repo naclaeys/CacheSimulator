@@ -43,7 +43,13 @@ public class InstructionInputFileReader implements InputReader {
         long thread = Long.parseLong(parts[2]); //TODO (eigenlijk fout, maar voorlopig betere optie)
         switch (parts[0]) {
             case "@I":
-                instr = new NormalInstruction(line, thread, parts[1]);
+                if(parts.length == 3) {
+                    instr = new NormalInstruction(line, thread, parts[1]); //TODO (eigenlijk fout, maar voorlopig betere optie)
+                } else if(parts.length == 4) {
+                    instr = new NormalInstruction(line, thread, parts[1], Long.parseLong(parts[3])); //TODO (eigenlijk fout, maar voorlopig betere optie)
+                } else {
+                    throw new IllegalArgumentException("Illegal instruction");
+                }
                 break;
             case "@M":
                 instr = new MemoryAccess(line, thread, parts[1]);
