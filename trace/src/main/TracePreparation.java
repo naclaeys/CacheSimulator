@@ -63,9 +63,11 @@ public class TracePreparation {
                 Address instrAddress = addressList.get(addressList.size()/2);
                 String description = "@I " + instrAddress.toString() + " " + threadId + " " + counting; //TODO (eigenlijk fout, maar voorlopig betere optie)
                 writer.write(description);
+                writer.newLine();
             }
             if(instr != null) {
                 writer.write(instr.getDescription());
+                writer.newLine();
                 
                 instr = reader.getInstruction();
             }
