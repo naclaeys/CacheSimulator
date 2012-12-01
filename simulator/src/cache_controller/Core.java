@@ -37,7 +37,7 @@ public class Core {
     
     private void increaseIndex() {
         index++;
-        if(index > threads.size()) {
+        if(index == threads.size()) {
             index = 0;
         }
     }
