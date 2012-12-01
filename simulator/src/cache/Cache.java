@@ -4,6 +4,7 @@
  */
 package cache;
 
+import cache_controller.instruction.Address;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
@@ -13,9 +14,6 @@ import javax.swing.event.EventListenerList;
  * @author Nathan
  */
 public abstract class Cache {
-    
-    public static final long HIT_COST = 1;
-    public static final long MISS_COST = 10;
     
     private long cacheHits;
     
@@ -78,13 +76,13 @@ public abstract class Cache {
     }
     
     // dit geeft enkel terug of dit in de cache zit of niet, verandert niets aan de cache
-    protected abstract boolean isHit(long adress);
+    protected abstract boolean isHit(Address adress);
     /**
      * dit zal het resultaat in de cache steken in het geval van een miss, 
      * als het een hit is zal dit de hit operatie van deze cache uitvoeren (bv, nieuwe timestamp voor LRU)
      * @param adress 
      */
-    protected abstract void addAddress(long adress);
+    protected abstract void addAddress(Address adress);
     
     /**
      * geeft de tijd terug die de cache nodig heeft om dit adress op te halen,
@@ -93,7 +91,7 @@ public abstract class Cache {
      * @param adress
      * @return 
      */
-    public abstract long getFetchTime(long adress);
+    public abstract long getFetchTime(Address adress);
     // wist alle adressen uit de cache, de cache word terug gebracht naar begin status
     public abstract void clearCacheMemory();
     

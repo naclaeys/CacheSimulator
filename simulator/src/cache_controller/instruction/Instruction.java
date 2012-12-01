@@ -16,12 +16,12 @@ public abstract class Instruction {
     private String description;
     
     private long thread;
-    private long instructionAdress;
+    private Address instructionAdress;
     
-    public Instruction(String description, long thread, long instructionAdress) {
+    public Instruction(String description, long thread, String instructionAdress) {
         this.description = description;
         this.thread = thread;
-        this.instructionAdress = instructionAdress;
+        this.instructionAdress = new Address(instructionAdress);
     }
 
     public String getDescription() {
@@ -32,8 +32,8 @@ public abstract class Instruction {
         return thread;
     }
 
-    public long getInstructionAdress() {
-        return instructionAdress;
+    public String getInstructionAdress() {
+        return instructionAdress.toString();
     }
     
     public abstract long getExecutionTime(Cache cache);

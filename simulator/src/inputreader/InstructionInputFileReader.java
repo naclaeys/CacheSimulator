@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.LineNumberReader;
 
 /**
  *
@@ -40,14 +41,13 @@ public class InstructionInputFileReader implements InputReader {
         Instruction instr;
         String[] parts = line.split(" ");
         
-        long thread = Long.parseLong(parts[1]);
-        long instructionAdress = Long.parseLong(parts[2]);
+        long thread = Long.parseLong(parts[2]);
         switch (parts[0]) {
             case "@I":
-                instr = new NormalInstruction(line, thread, instructionAdress);
+                instr = new NormalInstruction(line, thread, parts[1]);
                 break;
             case "@M":
-                instr = new MemoryAccess(line, thread, instructionAdress);
+                instr = new MemoryAccess(line, thread, parts[1]);
                 break;
             default:
                 throw new IllegalArgumentException("Illegal instruction");
@@ -71,6 +71,7 @@ public class InstructionInputFileReader implements InputReader {
                 if(line != null) {
                     try {
                         instr = createInstruction(line);
+                        valid = true;
                     } catch(Exception ex) {
                         valid = false;
                         //System.err.println("" + line);
@@ -95,7 +96,9 @@ public class InstructionInputFileReader implements InputReader {
         String[] parts = null;
         do{
             instr = getInstruction();
-            cpu.addThread(instr.getThread());
+            if(instr != null) {
+                cpu.addThread(instr.getThread());
+            }
         } while(instr != null && instr.getThread() != thread);
         
         if(instr == null) {

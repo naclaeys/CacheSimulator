@@ -11,20 +11,20 @@ import cache.Cache;
  * @author naclaeys
  */
 public class MemoryAccess extends Instruction {
-
-    public long[] adress;
     
-    public MemoryAccess(String description, long thread, long instructionAdress) {
+    public Address[] adress;
+    
+    public MemoryAccess(String description, long thread, String instructionAdress) {
         super(description, thread, instructionAdress);
         
         String[] splitDescr = description.split(" ");        
-        adress = new long[splitDescr.length - 3];
+        adress = new Address[splitDescr.length - 3];
         for(int i = 0; i < adress.length; i++) {
-            adress[i] = Long.parseLong(splitDescr[i + 3]);
+            adress[i] = new Address(splitDescr[i + 3]);
         }
     }
 
-    public long[] getAdress() {
+    public Address[] getAdress() {
         return adress;
     }
 

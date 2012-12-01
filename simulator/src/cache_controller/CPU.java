@@ -73,7 +73,7 @@ public class CPU {
             if(jumpIndex == JUMP) {
                 jumpIndex = 0;
                 for(int i = 0; i < cores.length; i++) {
-                    cores[i].print(i);
+                    //cores[i].print(i);
                 }
             }
         }

@@ -22,7 +22,6 @@ public class Core {
     private long previousCacheHits;
     
     private LinkedList<InstructionThread> threads;
-    private InstructionThread currentThread;
     
     public Core(Cache cache) {
         this.cache = cache;
@@ -33,38 +32,44 @@ public class Core {
         threads = new LinkedList<>();
     }
     
-    private void selectCurrentThread() {
-        boolean chosen = false;
+    private InstructionThread getExecutingThread() {
+        InstructionThread chosenThread = null;
+        
         InstructionThread thread = null;
-
         for(int i = 0; i < getThreadCount(); i++) {
             thread = threads.pop();
             threads.addLast(thread);
 
             thread.decreaseWaitingTime();
-            if(thread.getWaitingTime() == 0 && !chosen) {
-                currentThread = thread;
-                chosen = true;
+            if(thread.getWaitingTime() == 0 && chosenThread == null) {
+                chosenThread = thread;
             }
         }
-
-        do {
-            thread = threads.pop();
-            threads.addLast(thread);
-        } while(thread.getId() != currentThread.getId());
+        
+        if(chosenThread != null) {
+            // zet volgende thread keuze klaar, de thread vlak na degene die nu gekozen is
+            do {
+                thread = threads.pop();
+                threads.addLast(thread);
+            } while(thread.getId() != chosenThread.getId());
+        }
+        
+        return chosenThread;
     }
     
     public void execute() {
         if(!threads.isEmpty()) {
-            selectCurrentThread();
+            InstructionThread thread = getExecutingThread();
             
-            currentThread.setNextInstruction();
-            Instruction instr = currentThread.getInstruction();
-            if(instr == null) {
-                // geen instructies over, thread is klaar
-                threads.remove(currentThread);
-            } else {
-                currentThread.setWaitingTime(instr.getExecutionTime(cache));
+            if(thread != null) {
+                thread.setNextInstruction();
+                Instruction instr = thread.getInstruction();
+                if(instr == null) {
+                    // geen instructies over, thread is klaar
+                    threads.remove(thread);
+                } else {
+                    thread.setWaitingTime(instr.getExecutionTime(cache));
+                }
             }
         }        
     }

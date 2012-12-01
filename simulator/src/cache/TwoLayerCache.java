@@ -4,66 +4,62 @@
  */
 package cache;
 
+import cache_controller.instruction.Address;
+
 /**
  *
  * @author Nathan
  */
 public class TwoLayerCache extends Cache {
-
-    public static final long CACHE_HIT_LAYER2 = 10;
-    public static final long CACHE_MISS_LAYER2 = 100;
     
-    private Cache layer1;
-    private Cache layer2;
+    private BasicCache layer1;
+    private BasicCache layer2;
     
-    public TwoLayerCache(Cache layer1, Cache layer2) {
+    public TwoLayerCache(BasicCache layer1, BasicCache layer2) {
         this.layer1 = layer1;
         this.layer2 = layer2;
     }
     
-    public TwoLayerCache(int blockCount, int ways, Cache layer2) {
-        this(new BasicCache(blockCount, ways), layer2);
+    public TwoLayerCache(long hitCost, long missCost, int blockCount, int ways, int blockSize, BasicCache layer2) {
+        this(new BasicCache(hitCost, missCost, blockCount, ways, blockSize), layer2);
     }
     
-    public TwoLayerCache(int blockCount1, int ways1, int blockCount2, int ways2) {
-        this(new BasicCache(blockCount1, ways1), new BasicCache(blockCount2, ways2));
+    public TwoLayerCache(long hitCost1, long missCost1, int blockCount1, int ways1, int blockSize1, long hitCost2, long missCost2, int blockCount2, int ways2, int blockSize2) {
+        this(new BasicCache(hitCost1, missCost1, blockCount1, ways1, blockSize1), 
+                new BasicCache(hitCost2, missCost2, blockCount2, ways2, blockSize2));
     }
     
-    public TwoLayerCache(int blockCount1, int blockCount2, int ways) {
-        this(blockCount1, ways, blockCount2, ways);
-    }
-    
-    public TwoLayerCache(int blockCount, int ways) {
-        this(blockCount, ways, blockCount, ways);
+    public TwoLayerCache(long hitCost, long missCost, int blockCount, int ways, int blockSize) {
+        this(hitCost, missCost, blockCount, ways, blockSize, hitCost, missCost, blockCount, ways, blockSize);
     }
 
     @Override
-    protected boolean isHit(long adress) {
+    protected boolean isHit(Address adress) {
         return layer1.isHit(adress) || layer2.isHit(adress);
     }
 
     @Override
-    protected void addAddress(long adress) {
+    protected void addAddress(Address adress) {
         layer2.addAddress(adress);
         layer1.addAddress(adress);
     }
 
     @Override
-    public long getFetchTime(long adress) {
+    public long getFetchTime(Address adress) {
         long time;
         
         if(layer1.isHit(adress)) {
-            time = HIT_COST;
+            time = layer1.getHitCost();
             layer1.addCacheHit();
             addCacheHit();
         } else {
             layer1.addColdMiss();
             if(layer2.isHit(adress)) {
-                time = CACHE_HIT_LAYER2;
+                time = layer2.getHitCost();
                 layer2.addCacheHit();
                 addCacheHit();
             } else {
-                time = CACHE_MISS_LAYER2;
+                time = layer2.getMissCost();
                 layer2.addColdMiss();
                 addColdMiss();
             }

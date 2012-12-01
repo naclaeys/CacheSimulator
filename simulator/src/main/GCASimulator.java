@@ -19,36 +19,51 @@ import java.io.IOException;
  */
 public class GCASimulator {
     
+    public static final long HIT_COST_LAYER1 = 1;
+    public static final long MISS_COST_LAYER1 = 10;
+    public static final long HIT_COST_LAYER2 = 10;
+    public static final long MISS_COST_LAYER2 = 100;
+    
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException {
-        if(args.length < 3 | args.length > 4) {
-            throw new IllegalArgumentException("Usage: inputFile threadCount blockCount <configurationFile>");
+        if(args.length < 8 | args.length > 9) {
+            throw new IllegalArgumentException("Usage: inputFile coreCount shareLayer2 blockCount1 ways1 blockCount2 ways2 blockSize <configurationFile>");
         }
         File input = new File(args[0]);
         if(!input.isFile()) {
             throw new IllegalArgumentException("File not found: " + args[0]);
         }
         int coreCount = Integer.parseInt(args[1]);
-        int blockCount = Integer.parseInt(args[2]);
+        boolean shared = Boolean.parseBoolean(args[2]);
+        int blockCount1 = Integer.parseInt(args[3]);
+        int ways1 = Integer.parseInt(args[4]);
+        int blockCount2 = Integer.parseInt(args[5]);
+        int ways2 = Integer.parseInt(args[6]);
+        int blockSize = Integer.parseInt(args[7]);
         File configuration = null;
-        if(args.length == 4) {
-            configuration = new File(args[3]);
+        if(args.length == 9) {
+            configuration = new File(args[args.length - 1]);
             if(!configuration.isFile()) {
-                throw new IllegalArgumentException("File not found: " + args[3]);
+                throw new IllegalArgumentException("File not found: " + args[args.length - 1]);
             }
         }
         
-        //Cache c1 = new BasicCache(blockCount);
-        //Cache c2 = new TwoLayerCache(100, 1000, 4);
-        Cache[] c3 = new Cache[coreCount];
-        Cache layer2 = new BasicCache(blockCount, 4);
-        for(int i = 0; i < coreCount; i++) {
-            c3[i] = new TwoLayerCache(blockCount, 4, layer2);
+        Cache[] caches = new Cache[coreCount];
+        if(shared) {
+            BasicCache layer2 = new BasicCache(HIT_COST_LAYER2, MISS_COST_LAYER2, blockCount2, ways2, blockSize);
+            for(int i = 0; i < coreCount; i++) {
+                caches[i] = new TwoLayerCache(HIT_COST_LAYER1, HIT_COST_LAYER1, blockCount1, ways1, blockSize, layer2);
+            }
+        } else {
+            for(int i = 0; i < coreCount; i++) {
+                caches[i] = new TwoLayerCache(HIT_COST_LAYER1, HIT_COST_LAYER1, blockCount1, ways1, blockSize, 
+                        HIT_COST_LAYER2, MISS_COST_LAYER2, blockCount2, ways2, blockSize);
+            }
         }
         
-        CPU cpu = new CPU(input, c3);
+        CPU cpu = new CPU(input, caches);
         
         Instruction first = new InstructionInputFileReader(input, cpu).getInstruction();
         cpu.addThread(first.getThread());
@@ -58,7 +73,7 @@ public class GCASimulator {
         
         System.out.println("cyclus count: " + cpu.getCycleCount());
         for(int i = 0; i < coreCount; i++) {
-            c3[i].printStats();
+            caches[i].printStats();
             System.out.println("");
         }
     }

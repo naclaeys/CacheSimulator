@@ -4,6 +4,8 @@
  */
 package cache;
 
+import cache_controller.instruction.Address;
+
 /**
  *
  * @author Nathan
@@ -12,14 +14,13 @@ public class CacheBlock {
     
     private long timeStamp;
     
-    private long address;
+    private Address address;
 
     public CacheBlock() {
         timeStamp = -1;
-        address = -1;
     }
 
-    public void setAddress(long address, long timeStamp) {
+    public void setAddress(Address address, long timeStamp) {
         this.address = address;
         setTimeStamp(timeStamp);
     }
@@ -28,19 +29,20 @@ public class CacheBlock {
         this.timeStamp = timeStamp;
     }
 
-    public long getAddress() {
+    public Address getAddress() {
         return address;
     }
 
     public long getTimeStamp() {
         return timeStamp;
     }
-    
+
     public boolean isUsed() {
-        return timeStamp != -1;
+        return address != null;
     }
 
     void clear() {
+        address = null;
         timeStamp = -1;
     }
     

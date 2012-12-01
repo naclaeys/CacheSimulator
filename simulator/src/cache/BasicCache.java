@@ -4,25 +4,31 @@
  */
 package cache;
 
+import cache_controller.instruction.Address;
+
 /**
  *
  * @author Nathan
  */
-public class BasicCache extends Cache{
+public class BasicCache extends Cache {
     
     private long time;
     
+    private long hitCost;
+    private long missCost;
+    
     private CacheBlock[][] blocks;
+    // aantal adressen dat voorkomt in 1 cache block (grootte van de cache lijn)
+    private int blockSize;
     
-    public BasicCache(int blockCount) {
-        this(blockCount, 1);
-    }
-    
-    public BasicCache(int blockCount, int ways) {
+    public BasicCache(long hitCost, long missCost, int blockCount, int ways, int blockSize) {
         super();
         time = 0;
+        this.hitCost = hitCost;
+        this.missCost = missCost;
         
         blocks = new CacheBlock[(blockCount+ways-1)/ways][ways];
+        this.blockSize = blockSize;
         
         int count = 0;
         int i = 0;
@@ -46,64 +52,77 @@ public class BasicCache extends Cache{
             j++;
         }
     }
+
+    public long getHitCost() {
+        return hitCost;
+    }
+
+    public long getMissCost() {
+        return missCost;
+    }
     
-    @Override
-    protected boolean isHit(long adress) {
-        CacheBlock[] set = blocks[(int)(adress % ((long)blocks.length))];
-        
+    private Address getCacheAddress(Address address) {
+        return new Address("" + address.divideBy((long)blockSize));
+    }
+    
+    private CacheBlock[] getCorrectSet(Address address) {
+        return blocks[(int)(getCacheAddress(address).modOf((long)blocks.length))];
+    }
+    
+    private int getSetIndex(CacheBlock[] set, Address address) {
         int j = 0;
-        while(j < set.length && set[j].isUsed() && set[j].getAddress() != adress) {
+        while(j < set.length && set[j].isUsed() && !set[j].getAddress().equals(getCacheAddress(address))) {
             j++;
         }
-        
-        return j < set.length && set[j].isUsed();
+        return j;
     }
     
     @Override
-    protected void addAddress(long adress) {
-        CacheBlock[] set = blocks[(int)(adress % ((long)blocks.length))];
-        
-        int j = 0;
-        while(j < set.length && set[j].isUsed() && set[j].getAddress() != adress) {
-            j++;
-        }
+    protected boolean isHit(Address address) {
+        CacheBlock[] set = getCorrectSet(address);
+        int index = getSetIndex(set, address);
+        return index < set.length && set[index].isUsed();
+    }
+    
+    @Override
+    protected void addAddress(Address address) {
+        Address cacheAddress = getCacheAddress(address);
+        CacheBlock[] set = getCorrectSet(address);
+        int index = getSetIndex(set, address);
         
         CacheBlock block;
-        if(j >= set.length) {
+        if(index >= set.length) {
             block = selectCacheBlockLRU(set);
         } else {
-            block = set[j];
+            block = set[index];
         }
-        block.setAddress(adress, time);
+        block.setAddress(cacheAddress, time);
     }
 
     @Override
-    public long getFetchTime(long adress) {
+    public long getFetchTime(Address address) {
         time++;
         
-        CacheBlock[] set = blocks[(int)(adress % ((long)blocks.length))];
-
-        int j = 0;
-        while(j < set.length && set[j].isUsed() && set[j].getAddress() != adress) {
-            j++;
-        }
-
-        if(j < set.length && set[j].getAddress() == adress) {
-            set[j].setTimeStamp(time);
+        Address cacheAddress = getCacheAddress(address);
+        CacheBlock[] set = getCorrectSet(address);
+        int index = getSetIndex(set, address);
+        
+        if(index < set.length && set[index].getAddress().equals(cacheAddress)) {
+            set[index].setTimeStamp(time);
             addCacheHit();
-            return HIT_COST;
+            return hitCost;
         } else {
             CacheBlock block;
-            if(j == set.length) {
+            if(index >= set.length) {
                 block = selectCacheBlockLRU(set);
             } else {
-                block = set[j];
+                block = set[index];
             }
-            block.setAddress(adress, time);
+            block.setAddress(cacheAddress, time);
             
             // TODO vervangen door juiste misser
             addColdMiss();
-            return MISS_COST;
+            return missCost;
         }
     }
     
