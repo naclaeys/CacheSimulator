@@ -46,7 +46,8 @@ public class TracePreparation {
         BufferedWriter writer = new BufferedWriter(new FileWriter(output));
         
         Instruction instr = reader.getInstruction();
-        while(instr != null) {            
+        while(instr != null) {    
+            
             while(instr instanceof NormalInstruction) {
                 long counting = 0;
                 long threadId = instr.getThread();
@@ -63,10 +64,11 @@ public class TracePreparation {
                 String description = "@I " + instrAddress.toString() + " " + threadId + " " + counting; //TODO (eigenlijk fout, maar voorlopig betere optie)
                 writer.write(description);
             }
-            
-            writer.write(instr.getDescription());
-            
-            instr = reader.getInstruction();
+            if(instr != null) {
+                writer.write(instr.getDescription());
+                
+                instr = reader.getInstruction();
+            }
         }
         
         writer.close();
