@@ -39,33 +39,21 @@ public class TwoLayerCache extends Cache {
     }
 
     @Override
-    protected void addAddress(Address adress) {
-        layer2.addAddress(adress);
-        layer1.addAddress(adress);
-    }
-
-    @Override
     public long getFetchTime(Address adress) {
         long time;
         
         if(layer1.isHit(adress)) {
-            time = layer1.getHitCost();
-            layer1.addCacheHit();
+            time = layer1.getFetchTime(adress);
             addCacheHit();
         } else {
             layer1.addColdMiss();
             if(layer2.isHit(adress)) {
-                time = layer2.getHitCost();
-                layer2.addCacheHit();
                 addCacheHit();
             } else {
-                time = layer2.getMissCost();
-                layer2.addColdMiss();
                 addColdMiss();
             }
+            time = layer2.getFetchTime(adress);
         }
-        // instellen van cache missers en hits + toevoegen + refreshen
-        addAddress(adress);
         
         return time;
     }

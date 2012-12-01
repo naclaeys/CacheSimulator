@@ -5,6 +5,9 @@
 package cache;
 
 import cache_controller.instruction.Address;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 
 /**
  *
@@ -17,7 +20,9 @@ public class BasicCache extends Cache {
     private long hitCost;
     private long missCost;
     
-    private CacheBlock[][] blocks;
+    private int ways;
+    private ArrayList<HashMap<Address, CacheBlock>> blocks;
+    private CacheBlock[][] cacheBlocks;
     // aantal adressen dat voorkomt in 1 cache block (grootte van de cache lijn)
     private int blockSize;
     
@@ -27,16 +32,22 @@ public class BasicCache extends Cache {
         this.hitCost = hitCost;
         this.missCost = missCost;
         
-        blocks = new CacheBlock[(blockCount+ways-1)/ways][ways];
+        this.ways = ways;
+        int size = (blockCount+ways-1)/ways;
+        blocks = new ArrayList<>(size);
+        for(int i = 0; i < size; i++) {
+            blocks.add(new HashMap<Address, CacheBlock>((int)(ways/0.75)+1));
+        }
+        cacheBlocks = new CacheBlock[size][ways];
         this.blockSize = blockSize;
         
         int count = 0;
         int i = 0;
         int j = 0;
-        while(i < blocks.length && count < blockCount) {
+        while(i < cacheBlocks.length && count < blockCount) {
             j = 0;
-            while(j < blocks[i].length && count < blockCount) {
-                blocks[i][j] = new CacheBlock();
+            while(j < cacheBlocks[i].length && count < blockCount) {
+                cacheBlocks[i][j] = new CacheBlock();
                 count++;
                 j++;
             }
@@ -46,8 +57,8 @@ public class BasicCache extends Cache {
         }
         
         int k = 0;
-        while(j < blocks[i].length) {
-            blocks[i][j] = blocks[0][k];
+        while(j < cacheBlocks[i].length) {
+            cacheBlocks[i][j] = cacheBlocks[0][k];
             k++;
             j++;
         }
@@ -65,38 +76,15 @@ public class BasicCache extends Cache {
         return new Address("" + address.divideBy((long)blockSize));
     }
     
-    private CacheBlock[] getCorrectSet(Address address) {
-        return blocks[(int)(getCacheAddress(address).modOf((long)blocks.length))];
-    }
-    
-    private int getSetIndex(CacheBlock[] set, Address address) {
-        int j = 0;
-        while(j < set.length && set[j].isUsed() && !set[j].getAddress().equals(getCacheAddress(address))) {
-            j++;
-        }
-        return j;
+    private HashMap<Address, CacheBlock> getCorrectMap(Address cacheAddress) {
+        return blocks.get((int)(cacheAddress.modOf((long)blocks.size())));
     }
     
     @Override
     protected boolean isHit(Address address) {
-        CacheBlock[] set = getCorrectSet(address);
-        int index = getSetIndex(set, address);
-        return index < set.length && set[index].isUsed();
-    }
-    
-    @Override
-    protected void addAddress(Address address) {
         Address cacheAddress = getCacheAddress(address);
-        CacheBlock[] set = getCorrectSet(address);
-        int index = getSetIndex(set, address);
-        
-        CacheBlock block;
-        if(index >= set.length) {
-            block = selectCacheBlockLRU(set);
-        } else {
-            block = set[index];
-        }
-        block.setAddress(cacheAddress, time);
+        HashMap<Address, CacheBlock> map = getCorrectMap(cacheAddress);
+        return map.containsKey(cacheAddress);
     }
 
     @Override
@@ -104,19 +92,19 @@ public class BasicCache extends Cache {
         time++;
         
         Address cacheAddress = getCacheAddress(address);
-        CacheBlock[] set = getCorrectSet(address);
-        int index = getSetIndex(set, address);
+        HashMap<Address, CacheBlock> map = getCorrectMap(cacheAddress);
         
-        if(index < set.length && set[index].getAddress().equals(cacheAddress)) {
-            set[index].setTimeStamp(time);
+        if(map.containsKey(cacheAddress)) {
+            map.get(cacheAddress).setTimeStamp(time);
             addCacheHit();
             return hitCost;
         } else {
             CacheBlock block;
-            if(index >= set.length) {
-                block = selectCacheBlockLRU(set);
+            if(map.size() == ways) {
+                block = selectCacheBlockLRU(map);
             } else {
-                block = set[index];
+                block = new CacheBlock();
+                map.put(cacheAddress, block);
             }
             block.setAddress(cacheAddress, time);
             
@@ -126,21 +114,22 @@ public class BasicCache extends Cache {
         }
     }
     
-    private CacheBlock selectCacheBlockLRU(CacheBlock[] set) {
-        int oldestIndex = 0;
-        for(int i = 1; i < set.length; i++) {
-            if(set[oldestIndex].getTimeStamp() > set[i].getTimeStamp()) {
-                oldestIndex = i;
+    private CacheBlock selectCacheBlockLRU(HashMap<Address, CacheBlock> map) {
+        Collection<CacheBlock> values = map.values();
+        CacheBlock oldest = null;
+        for(CacheBlock block: values) {
+            if(oldest == null || oldest.getTimeStamp() > block.getTimeStamp()) {
+                oldest = block;
             }
         }
-        return set[oldestIndex];
+        return oldest;
     }
 
     @Override
     public void clearCacheMemory() {
-        for(int i = 0; i < blocks.length; i++) {
-            for(int j = 0; j < blocks[i].length; j++) {
-                blocks[i][j].clear();
+        for(int i = 0; i < cacheBlocks.length; i++) {
+            for(int j = 0; j < cacheBlocks[i].length; j++) {
+                cacheBlocks[i][j].clear();
             }
         }
     }

@@ -4,7 +4,8 @@
  */
 package cache_controller.instruction;
 
-import cache_controller.instruction.Address;
+import java.math.BigInteger;
+import java.util.Objects;
 
 /**
  *
@@ -12,26 +13,23 @@ import cache_controller.instruction.Address;
  */
 public class Address {
 
-    private boolean big;
-    private long address;
+    private BigInteger address;
     
     public Address(String address) {
+        this.address = new BigInteger(address);
     }
 
     public long modOf(long mod) {
-        //TODO big
-        return address % mod;
+        return address.mod(BigInteger.valueOf(mod)).longValue();
     }
     
     public long divideBy(long divider) {
-        //TODO big meetellen
-        return address/divider;
+        return address.divide(BigInteger.valueOf(divider)).longValue();
     }
     
     @Override
     public String toString() {
-        //TODO big meetellen
-        return "" + address;
+        return address.toString();
     }
     
     @Override
@@ -40,6 +38,11 @@ public class Address {
             return false;
         }
         return ((Address)obj).toString().equals(toString());
+    }
+
+    @Override
+    public int hashCode() {
+        return address.hashCode();
     }
     
 }

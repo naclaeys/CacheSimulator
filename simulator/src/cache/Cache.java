@@ -81,9 +81,9 @@ public abstract class Cache {
      * dit zal het resultaat in de cache steken in het geval van een miss, 
      * als het een hit is zal dit de hit operatie van deze cache uitvoeren (bv, nieuwe timestamp voor LRU)
      * @param adress 
-     */
+     
     protected abstract void addAddress(Address adress);
-    
+    */
     /**
      * geeft de tijd terug die de cache nodig heeft om dit adress op te halen,
      * dit voert ook alle operaties uit die verwant zijn aan iets opvragen uit het geheugen 

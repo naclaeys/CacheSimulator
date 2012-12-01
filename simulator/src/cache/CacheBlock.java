@@ -20,6 +20,11 @@ public class CacheBlock {
         timeStamp = -1;
     }
 
+    public CacheBlock(long timeStamp, Address address) {
+        this.timeStamp = timeStamp;
+        this.address = address;
+    }
+
     public void setAddress(Address address, long timeStamp) {
         this.address = address;
         setTimeStamp(timeStamp);
