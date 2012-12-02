@@ -106,12 +106,11 @@ public class Core {
         long missDiff1 = cache.getLayer1().getTotalMisses() - previousCacheMiss1;
         long hitDiff1 = cache.getLayer1().getCacheHits() - previousCacheHits1;
         
-        long missDiff2 = cache.getLayer2().getColdMiss() - previousCacheMiss2;
+        long missDiff2 = cache.getLayer2().getTotalMisses() - previousCacheMiss2;
         long hitDiff2 = cache.getLayer2().getCacheHits() - previousCacheHits2;
         
         String print = "";
-        if(missDiff1 != 0 || hitDiff1 != 0 
-                || missDiff2 != 0 || hitDiff2 != 0) {
+        if(missDiff2 != 0) {
             print += "" + 0 + ";" + cyclus + ";" + missDiff2 + System.lineSeparator();
         }
         for(InstructionThread thread: threads) {

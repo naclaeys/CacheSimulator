@@ -119,9 +119,18 @@ public class InstructionInputFileReader implements InputReader {
                     increaseRead(line);
                     // invalid instr worden null
                     instr = createInstruction(line);
+                } else {
+                    try {
+                        window.dispose();
+                        reader.close();
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    } finally {
+                        closed = true;
+                        return null;
+                    }
                 }
             } catch (IOException ex) {
-                ex.printStackTrace();
                 throw new RuntimeException(ex);
             }
         } while(line != null && instr == null);
@@ -142,19 +151,7 @@ public class InstructionInputFileReader implements InputReader {
                 cpu.addThread(instr.getThread(), new InstructionInputFileReader(new File(basicName + instr.getThread() + ".txt"), basicName, cpu));
             }
         } while(instr != null && instr.getThread() != thread);
-        
-        if(instr == null) {
-            try {
-                reader.close();
-                window.dispose();
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            } finally {
-                closed = true;
-                return null;
-            }
-        }
-        
+                
         return instr;
     }
 }
