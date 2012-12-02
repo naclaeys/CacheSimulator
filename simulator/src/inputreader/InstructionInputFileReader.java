@@ -8,11 +8,14 @@ import cache_controller.CPU;
 import cache_controller.instruction.Instruction;
 import cache_controller.instruction.MemoryAccess;
 import cache_controller.instruction.NormalInstruction;
+import java.awt.FlowLayout;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import javax.swing.JFrame;
+import javax.swing.JProgressBar;
 
 /**
  *
@@ -22,11 +25,26 @@ public class InstructionInputFileReader implements InputReader {
     
     private String basicName;
     
+    private long totalSize;
+    private long read;
+    private int count;
+    private JFrame window;
+    private JProgressBar bar;
+    
     private BufferedReader reader;
     private boolean closed;
     private CPU cpu;
     
     public InstructionInputFileReader(File input, String basicName, CPU cpu) {
+        totalSize = input.length();
+        read = 0;
+        count = 0;
+        window = new JFrame(input.getName());
+        window.setVisible(true);
+        window.setLayout(new FlowLayout());
+        bar = new JProgressBar(0, 1000);
+        window.add(bar);
+        window.pack();
         try {
             reader = new BufferedReader(new FileReader(input));
         } catch (FileNotFoundException ex) {
@@ -40,6 +58,17 @@ public class InstructionInputFileReader implements InputReader {
     
     public BufferedReader getReader() {
         return reader;
+    }
+    
+    private void increaseRead(String line) {
+        read += line.length() + 1;
+        count++;
+        
+        if(count == 100) {
+            count = 0;
+            long max = (long)bar.getMaximum();
+            bar.setValue((int)((max*read)/totalSize));
+        }
     }
     
     private Instruction createInstruction(String line) {
@@ -63,6 +92,7 @@ public class InstructionInputFileReader implements InputReader {
                     break;
                 case "@S":
                     instr = new NormalInstruction(line, thread, "0");
+                    break;
                 default:
                     throw new IllegalArgumentException("Illegal instruction");
             }
@@ -86,6 +116,7 @@ public class InstructionInputFileReader implements InputReader {
             try {
                 line = reader.readLine();
                 if(line != null) {
+                    increaseRead(line);
                     // invalid instr worden null
                     instr = createInstruction(line);
                 }
@@ -108,13 +139,14 @@ public class InstructionInputFileReader implements InputReader {
         do {
             instr = getInstruction();
             if(instr != null && instr.getThread() != thread) {
-                cpu.addThread(thread, new InstructionInputFileReader(new File(basicName + instr.getThread() + ".txt"), basicName, cpu));
+                cpu.addThread(instr.getThread(), new InstructionInputFileReader(new File(basicName + instr.getThread() + ".txt"), basicName, cpu));
             }
         } while(instr != null && instr.getThread() != thread);
         
         if(instr == null) {
             try {
                 reader.close();
+                window.dispose();
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             } finally {
