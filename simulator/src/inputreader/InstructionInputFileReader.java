@@ -107,7 +107,7 @@ public class InstructionInputFileReader implements InputReader {
         Instruction instr = null;
         do {
             instr = getInstruction();
-            if(instr.getThread() != thread) {
+            if(instr != null && instr.getThread() != thread) {
                 cpu.addThread(thread, new InstructionInputFileReader(new File(basicName + instr.getThread() + ".txt"), basicName, cpu));
             }
         } while(instr != null && instr.getThread() != thread);
