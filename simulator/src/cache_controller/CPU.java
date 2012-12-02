@@ -38,8 +38,12 @@ public class CPU {
     public long getCycleCount() {
         return cycleCount;
     }
+
+    public HashSet<Long> getThreadsDiscovered() {
+        return threadsDiscovered;
+    }
     
-    public void addThread(long thread) {
+    public void addThread(long thread, InstructionInputFileReader reader) {
         if(!threadsDiscovered.contains(thread)) {
             threadsDiscovered.add(thread);
             
@@ -49,7 +53,7 @@ public class CPU {
                     min = i;
                 }
             }
-            cores[min].addThread(thread, new InstructionInputFileReader(new File(input + "" + thread + ".txt"), this));
+            cores[min].addThread(thread, reader);
         }
     }
 

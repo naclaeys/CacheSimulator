@@ -10,11 +10,9 @@ import cache_controller.instruction.MemoryAccess;
 import cache_controller.instruction.NormalInstruction;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashSet;
 
 /**
  *
@@ -22,24 +20,24 @@ import java.util.HashSet;
  */
 public class InstructionInputFileReader implements InputReader {
     
+    private String basicName;
+    
     private BufferedReader reader;
     private boolean closed;
-    
-    private HashSet<Long> threadsDiscovered;
     private CPU cpu;
     
-    public InstructionInputFileReader(File input, CPU cpu) {
+    public InstructionInputFileReader(File input, String basicName, CPU cpu) {
         try {
             reader = new BufferedReader(new FileReader(input));
         } catch (FileNotFoundException ex) {
             throw new RuntimeException(ex);
         }
         closed = false;
-        threadsDiscovered = new HashSet<>();
         
+        this.basicName = basicName;
         this.cpu = cpu;
     }
-
+    
     public BufferedReader getReader() {
         return reader;
     }
@@ -48,7 +46,7 @@ public class InstructionInputFileReader implements InputReader {
         Instruction instr = null;
         try {
             String[] parts = line.split(" ");
-
+            
             long thread = Long.parseLong(parts[1]);
             switch (parts[0]) {
                 case "@I":
@@ -63,6 +61,8 @@ public class InstructionInputFileReader implements InputReader {
                 case "@M":
                     instr = new MemoryAccess(line, thread, parts[2]);
                     break;
+                case "@S":
+                    instr = new NormalInstruction(line, thread, "");
                 default:
                     throw new IllegalArgumentException("Illegal instruction");
             }
@@ -98,65 +98,20 @@ public class InstructionInputFileReader implements InputReader {
         return instr;
     }
     
-    public String getLine(long thread) {
-        String line = null;
-        String[] parts;
-        long tempThread;;
-        do {
-            try {
-                line = reader.readLine();
-                
-                if(line != null) {
-                    parts = line.split(" ");
-                    if(parts.length >= 3) {
-                        try {
-                            tempThread = Long.parseLong(parts[1]);
-                            if(!threadsDiscovered.contains(tempThread) || tempThread == thread) {
-                                return line;
-                            }
-                        } catch(Exception e) {
-                            System.err.println(line);
-                        }
-                    }
-                }
-            } catch(IOException ex) {
-                throw new RuntimeException(ex);
-            }
-        } while(line != null);
-        
-        return line;
-    }
-    
     @Override
     public Instruction getInstructionFromThread(long thread) {
         if(closed) {
             return null;
         }
         
-        String line = null;
         Instruction instr = null;
         do {
-            line = getLine(thread);
-            if(line != null) {
-                instr = createInstruction(line);
-                if(instr != null && instr.getThread() != thread) {
-                    threadsDiscovered.add(instr.getThread());
-                    cpu.addThread(instr.getThread());
-                    instr = null;
-                }
-            } else {
-                instr = null;
-            }
-        } while(line != null && instr == null);
-        
-        /*
-        do{
             instr = getInstruction();
-            if(instr != null) {
-                cpu.addThread(instr.getThread(), lineNumber-1);
+            if(instr.getThread() != thread) {
+                cpu.addThread(thread, new InstructionInputFileReader(new File(basicName + instr.getThread() + ".txt"), basicName, cpu));
             }
         } while(instr != null && instr.getThread() != thread);
-        */
+        
         if(instr == null) {
             try {
                 reader.close();

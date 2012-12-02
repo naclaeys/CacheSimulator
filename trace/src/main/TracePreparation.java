@@ -35,7 +35,7 @@ public class TracePreparation {
         }
         String output = args[args.length - 1];
         
-        InstructionInputFileReader reader = new InstructionInputFileReader(input, null);
+        InstructionInputFileReader reader = new InstructionInputFileReader(input, null, null);
         HashMap<Long, BufferedWriter> writers = new HashMap<>();
         
         Instruction instr = reader.getInstruction();
