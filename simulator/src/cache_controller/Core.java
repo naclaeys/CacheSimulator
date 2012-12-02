@@ -4,7 +4,6 @@
  */
 package cache_controller;
 
-import cache.Cache;
 import cache.TwoLayerCache;
 import cache_controller.instruction.Instruction;
 import cache_controller.instruction.InstructionThread;
@@ -20,11 +19,9 @@ public class Core {
 
     private TwoLayerCache cache;
     
-    private long previousCacheColdMiss1;
-    private long previousCacheConflictMiss1;
+    private long previousCacheMiss1;
     private long previousCacheHits1;
-    private long previousCacheColdMiss2;
-    private long previousCacheConflictMiss2;
+    private long previousCacheMiss2;
     private long previousCacheHits2;
     
     private int index;
@@ -33,11 +30,9 @@ public class Core {
     public Core(TwoLayerCache cache) {
         this.cache = cache;
         
-        previousCacheColdMiss1 = 0;
-        previousCacheConflictMiss1 = 0;
+        previousCacheMiss1 = 0;
         previousCacheHits1 = 0;
-        previousCacheColdMiss2 = 0;
-        previousCacheConflictMiss2 = 0;
+        previousCacheMiss2 = 0;
         previousCacheHits2 = 0;
         
         index = 0;
@@ -107,35 +102,29 @@ public class Core {
         return threads.size();
     }
     
-    public String print(long id) {
-        long coldMissDiff1 = cache.getLayer1().getColdMiss() - previousCacheColdMiss1;
-        long conflictMissDiff1 = cache.getLayer1().getConflictMiss() - previousCacheConflictMiss1;
+    public String print(long id, long cyclus) {
+        long missDiff1 = cache.getLayer1().getTotalMisses() - previousCacheMiss1;
         long hitDiff1 = cache.getLayer1().getCacheHits() - previousCacheHits1;
         
-        long coldMissDiff2 = cache.getLayer2().getColdMiss() - previousCacheColdMiss2;
-        long conflictMissDiff2 = cache.getLayer2().getConflictMiss() - previousCacheConflictMiss2;
+        long missDiff2 = cache.getLayer2().getColdMiss() - previousCacheMiss2;
         long hitDiff2 = cache.getLayer2().getCacheHits() - previousCacheHits2;
         
         String print = "";
-        if(coldMissDiff1 != 0 || conflictMissDiff1 != 0 || hitDiff1 != 0 
-                || coldMissDiff2 != 0 || conflictMissDiff2 != 0 || hitDiff2 != 0) {
-            print = "" + id + " " + coldMissDiff1 + " " + conflictMissDiff1 + " " + hitDiff1 
-                    + " " + coldMissDiff2 + " " + conflictMissDiff2 + " " + hitDiff2;
-            Iterator<InstructionThread> it = threads.iterator();
-            while(it.hasNext()) {
-                Instruction instr = it.next().getInstruction();
-                if(instr != null) {
-                    print += " " + instr.getInstructionAdress();
-                }
+        if(missDiff1 != 0 || hitDiff1 != 0 
+                || missDiff2 != 0 || hitDiff2 != 0) {
+            print += "" + 0 + ";" + cyclus + ";" + missDiff2 + System.lineSeparator();
+        }
+        for(InstructionThread thread: threads) {
+            Instruction instr = thread.getInstruction();
+            if(instr != null) {
+                print += "" + 1 + ";" + cyclus + ";" + instr.getInstructionAdress() + System.lineSeparator();
             }
         }
         
-        previousCacheColdMiss1 = cache.getLayer1().getColdMiss();
-        previousCacheConflictMiss1 = cache.getLayer1().getConflictMiss();
+        previousCacheMiss1 = cache.getLayer1().getTotalMisses();
         previousCacheHits1 = cache.getLayer1().getCacheHits();
         
-        previousCacheColdMiss2 = cache.getLayer2().getColdMiss();
-        previousCacheConflictMiss2 = cache.getLayer2().getConflictMiss();
+        previousCacheMiss2 = cache.getLayer2().getTotalMisses();
         previousCacheHits2 = cache.getLayer2().getCacheHits();
         
         return print;

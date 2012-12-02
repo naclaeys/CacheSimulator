@@ -6,8 +6,8 @@ package cache_controller;
 
 import cache.TwoLayerCache;
 import inputreader.InstructionInputFileReader;
-import java.io.File;
 import java.util.HashSet;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 /**
  *
@@ -15,7 +15,7 @@ import java.util.HashSet;
  */
 public class CPU {
     
-    public static final long JUMP = 1000;
+    public static final long JUMP = 10000;
     
     private long cycleCount;
     
@@ -78,9 +78,9 @@ public class CPU {
                 jumpIndex = 0;
                 String print = "";
                 for(int i = 0; i < cores.length; i++) {
-                    print += cores[i].print(i) + ";";                    
+                    print += cores[i].print(i, cycleCount);                    
                 }
-                System.out.println(print);
+                System.out.print(print);
             }
         }
     }
