@@ -62,7 +62,7 @@ public class InstructionInputFileReader implements InputReader {
                     instr = new MemoryAccess(line, thread, parts[2]);
                     break;
                 case "@S":
-                    instr = new NormalInstruction(line, thread, "");
+                    instr = new NormalInstruction(line, thread, "0");
                 default:
                     throw new IllegalArgumentException("Illegal instruction");
             }
