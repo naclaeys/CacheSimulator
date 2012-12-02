@@ -33,6 +33,14 @@ public class TwoLayerCache extends Cache {
         this(hitCost, missCost, blockCount, ways, blockSize, hitCost, missCost, blockCount, ways, blockSize);
     }
 
+    public BasicCache getLayer1() {
+        return layer1;
+    }
+
+    public BasicCache getLayer2() {
+        return layer2;
+    }
+
     @Override
     protected boolean isHit(Address adress) {
         return layer1.isHit(adress) || layer2.isHit(adress);
@@ -44,14 +52,8 @@ public class TwoLayerCache extends Cache {
         
         if(layer1.isHit(adress)) {
             time = layer1.getFetchTime(adress);
-            addCacheHit();
         } else {
-            layer1.addColdMiss();
-            if(layer2.isHit(adress)) {
-                addCacheHit();
-            } else {
-                addColdMiss();
-            }
+            layer1.getFetchTime(adress);
             time = layer2.getFetchTime(adress);
         }
         

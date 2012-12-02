@@ -98,7 +98,7 @@ public class InstructionInputFileReader implements InputReader {
                         valid = true;
                     } catch(Exception ex) {
                         valid = false;
-                        System.err.println("" + line);
+                        //System.err.println("" + line);
                     }
                 }
             } catch (IOException ex) {

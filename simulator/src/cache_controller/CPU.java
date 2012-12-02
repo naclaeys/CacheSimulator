@@ -4,7 +4,7 @@
  */
 package cache_controller;
 
-import cache.Cache;
+import cache.TwoLayerCache;
 import inputreader.InstructionInputFileReader;
 import java.io.File;
 import java.util.HashSet;
@@ -15,7 +15,7 @@ import java.util.HashSet;
  */
 public class CPU {
     
-    public static final long JUMP = 500;
+    public static final long JUMP = 1000;
     
     private long cycleCount;
     
@@ -24,7 +24,7 @@ public class CPU {
     private Core[] cores;
     private HashSet<Long> threadsDiscovered;
     
-    public CPU(File input, Cache[] caches) {
+    public CPU(File input, TwoLayerCache[] caches) {
         this.cycleCount = 0;
         this.input = input;
         
@@ -70,11 +70,13 @@ public class CPU {
             
             cycleCount++;
             jumpIndex ++;
-            if(jumpIndex == JUMP) {
+            if(jumpIndex >= JUMP) {
                 jumpIndex = 0;
+                String print = "";
                 for(int i = 0; i < cores.length; i++) {
-                    //cores[i].print(i);
+                    print += cores[i].print(i) + ";";                    
                 }
+                System.out.println(print);
             }
         }
     }

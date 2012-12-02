@@ -8,6 +8,7 @@ import cache_controller.instruction.Address;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  *
@@ -21,6 +22,7 @@ public class BasicCache extends Cache {
     private long missCost;
     
     private int ways;
+    private HashSet<Address> seen;
     private ArrayList<HashMap<Address, CacheBlock>> blocks;
     // aantal adressen dat voorkomt in 1 cache block (grootte van de cache lijn)
     private int blockSize;
@@ -33,6 +35,7 @@ public class BasicCache extends Cache {
         
         this.ways = ways;
         this.blockSize = blockSize;
+        seen = new HashSet<>();
         int size = (blockCount+ways-1)/ways;
         blocks = new ArrayList<>(size);
         for(int i = 0; i < size; i++) {
@@ -85,8 +88,12 @@ public class BasicCache extends Cache {
             block.setAddress(cacheAddress, time);
             map.put(cacheAddress, block);
             
-            // TODO vervangen door juiste misser
-            addColdMiss();
+            if(seen.contains(cacheAddress)) {
+                addConflictMiss();
+            } else {
+                seen.add(cacheAddress);
+                addColdMiss();
+            }
             return missCost;
         }
     }

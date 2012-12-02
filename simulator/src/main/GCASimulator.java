@@ -51,7 +51,7 @@ public class GCASimulator {
             }
         }
         
-        Cache[] caches = new Cache[coreCount];
+        TwoLayerCache[] caches = new TwoLayerCache[coreCount];
         if(shared) {
             BasicCache layer2 = new BasicCache(HIT_COST_LAYER2, MISS_COST_LAYER2, blockCount2, ways2, blockSize);
             for(int i = 0; i < coreCount; i++) {
