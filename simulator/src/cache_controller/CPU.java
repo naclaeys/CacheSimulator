@@ -19,12 +19,12 @@ public class CPU {
     
     private long cycleCount;
     
-    private File input;
+    private String input;
     
     private Core[] cores;
     private HashSet<Long> threadsDiscovered;
     
-    public CPU(File input, TwoLayerCache[] caches) {
+    public CPU(String input, TwoLayerCache[] caches) {
         this.cycleCount = 0;
         this.input = input;
         
@@ -39,7 +39,7 @@ public class CPU {
         return cycleCount;
     }
     
-    public void addThread(long thread, long lineNumber) {
+    public void addThread(long thread) {
         if(!threadsDiscovered.contains(thread)) {
             threadsDiscovered.add(thread);
             
@@ -49,7 +49,7 @@ public class CPU {
                     min = i;
                 }
             }
-            cores[min].addThread(thread, new InstructionInputFileReader(input, this, lineNumber));
+            cores[min].addThread(thread, new InstructionInputFileReader(new File(input + "" + thread + ".txt"), this));
         }
     }
 

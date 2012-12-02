@@ -31,10 +31,7 @@ public class GCASimulator {
         if(args.length < 8 | args.length > 9) {
             throw new IllegalArgumentException("Usage: inputFile coreCount shareLayer2 blockCount1 ways1 blockCount2 ways2 blockSize <configurationFile>");
         }
-        File input = new File(args[0]);
-        if(!input.isFile()) {
-            throw new IllegalArgumentException("File not found: " + args[0]);
-        }
+        String input = args[0];
         int coreCount = Integer.parseInt(args[1]);
         boolean shared = Boolean.parseBoolean(args[2]);
         int blockCount1 = Integer.parseInt(args[3]);
@@ -65,9 +62,9 @@ public class GCASimulator {
         
         CPU cpu = new CPU(input, caches);
         
-        InstructionInputFileReader reader = new InstructionInputFileReader(input, cpu, 0);
+        InstructionInputFileReader reader = new InstructionInputFileReader(new File(input + ".txt"), cpu);
         Instruction instr = reader.getInstruction();
-        cpu.addThread(instr.getThread(), 0);
+        cpu.addThread(instr.getThread());
         reader.getReader().close();
         
         cpu.start();

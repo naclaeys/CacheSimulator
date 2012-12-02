@@ -35,12 +35,12 @@ public class TracePreparation {
         }
         String output = args[args.length - 1];
         
-        InstructionInputFileReader reader = new InstructionInputFileReader(input, null, 0);
+        InstructionInputFileReader reader = new InstructionInputFileReader(input, null);
         HashMap<Long, BufferedWriter> writers = new HashMap<>();
         
         Instruction instr = reader.getInstruction();
         long firstThread = instr.getThread();
-        writers.put(firstThread, new BufferedWriter(new FileWriter(createOutputFile(output, firstThread))));
+        writers.put(firstThread, new BufferedWriter(new FileWriter(createOutputFile(output))));
         while(instr != null) {    
             
             while(instr instanceof NormalInstruction) {
@@ -75,10 +75,10 @@ public class TracePreparation {
         }
     }
     
-    private static File createOutputFile(String output, long thread) throws IOException {
-        File outputFile = new File(output + "" + thread + ".txt");
+    private static File createOutputFile(String name) throws IOException {
+        File outputFile = new File(name + ".txt");
         if(outputFile.exists() && !outputFile.isFile()) {
-            throw new IllegalArgumentException("wrong file name: " + output);
+            throw new IllegalArgumentException("wrong file name: " + name);
         }
         if(outputFile.exists()) {
             outputFile.delete();
@@ -89,7 +89,7 @@ public class TracePreparation {
     
     private static void checkThread(String output, long thread, HashMap<Long, BufferedWriter> writers, long firstThread) throws IOException {
         if(!writers.containsKey(thread)) {
-            writers.put(thread, new BufferedWriter(new FileWriter(createOutputFile(output, thread))));
+            writers.put(thread, new BufferedWriter(new FileWriter(createOutputFile(output + "" + thread))));
             
             writeInstruction("@S " + thread, writers.get(firstThread));
         }

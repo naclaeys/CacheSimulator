@@ -23,35 +23,21 @@ import java.util.HashSet;
 public class InstructionInputFileReader implements InputReader {
     
     private BufferedReader reader;
-    private long lineNumber;
     private boolean closed;
     
     private HashSet<Long> threadsDiscovered;
     private CPU cpu;
     
-    public InstructionInputFileReader(File input, CPU cpu, long lineNumber) {
+    public InstructionInputFileReader(File input, CPU cpu) {
         try {
             reader = new BufferedReader(new FileReader(input));
         } catch (FileNotFoundException ex) {
             throw new RuntimeException(ex);
         }
-        this.lineNumber = 0;
-        skipToLine(lineNumber);
         closed = false;
         threadsDiscovered = new HashSet<>();
         
         this.cpu = cpu;
-    }
-    
-    private void skipToLine(long lineNumber) {
-        while(this.lineNumber < lineNumber) {
-            try {
-                reader.readLine();
-                this.lineNumber++;
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
-        }
     }
 
     public BufferedReader getReader() {
@@ -99,7 +85,6 @@ public class InstructionInputFileReader implements InputReader {
         do {
             try {
                 line = reader.readLine();
-                lineNumber++;
                 if(line != null) {
                     // invalid instr worden null
                     instr = createInstruction(line);
@@ -120,7 +105,6 @@ public class InstructionInputFileReader implements InputReader {
         do {
             try {
                 line = reader.readLine();
-                lineNumber++;
                 
                 if(line != null) {
                     parts = line.split(" ");
@@ -157,7 +141,7 @@ public class InstructionInputFileReader implements InputReader {
                 instr = createInstruction(line);
                 if(instr != null && instr.getThread() != thread) {
                     threadsDiscovered.add(instr.getThread());
-                    cpu.addThread(instr.getThread(), lineNumber);
+                    cpu.addThread(instr.getThread());
                     instr = null;
                 }
             } else {
