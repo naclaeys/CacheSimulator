@@ -86,6 +86,12 @@ public class Core {
                 Instruction instr = thread.getInstruction();
                 if(instr == null) {
                     // geen instructies over, thread is klaar
+                    int threadIndex = threads.indexOf(thread);
+                    if(threadIndex < index) {
+                        index--;
+                    } else if(threadIndex == index) {
+                        increaseIndex();
+                    }
                     threads.remove(thread);
                 } else {
                     thread.setWaitingTime(instr.getExecutionTime(cache));
