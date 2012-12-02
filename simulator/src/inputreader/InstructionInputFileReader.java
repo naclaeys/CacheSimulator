@@ -10,9 +10,11 @@ import cache_controller.instruction.MemoryAccess;
 import cache_controller.instruction.NormalInstruction;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashSet;
 
 /**
  *
@@ -24,6 +26,7 @@ public class InstructionInputFileReader implements InputReader {
     private long lineNumber;
     private boolean closed;
     
+    private HashSet<Long> threadsDiscovered;
     private CPU cpu;
     
     public InstructionInputFileReader(File input, CPU cpu, long lineNumber) {
@@ -35,6 +38,7 @@ public class InstructionInputFileReader implements InputReader {
         this.lineNumber = 0;
         skipToLine(lineNumber);
         closed = false;
+        threadsDiscovered = new HashSet<>();
         
         this.cpu = cpu;
     }
@@ -55,25 +59,29 @@ public class InstructionInputFileReader implements InputReader {
     }
     
     private Instruction createInstruction(String line) {
-        Instruction instr;
-        String[] parts = line.split(" ");
-        
-        long thread = Long.parseLong(parts[1]);
-        switch (parts[0]) {
-            case "@I":
-                if(parts.length == 3) {
-                    instr = new NormalInstruction(line, thread, parts[2]);
-                } else if(parts.length == 4) {
-                    instr = new NormalInstruction(line, thread, parts[2], Long.parseLong(parts[3]));
-                } else {
+        Instruction instr = null;
+        try {
+            String[] parts = line.split(" ");
+
+            long thread = Long.parseLong(parts[1]);
+            switch (parts[0]) {
+                case "@I":
+                    if(parts.length == 3) {
+                        instr = new NormalInstruction(line, thread, parts[2]);
+                    } else if(parts.length == 4) {
+                        instr = new NormalInstruction(line, thread, parts[2], Long.parseLong(parts[3]));
+                    } else {
+                        throw new IllegalArgumentException("Illegal instruction");
+                    }
+                    break;
+                case "@M":
+                    instr = new MemoryAccess(line, thread, parts[2]);
+                    break;
+                default:
                     throw new IllegalArgumentException("Illegal instruction");
-                }
-                break;
-            case "@M":
-                instr = new MemoryAccess(line, thread, parts[2]);
-                break;
-            default:
-                throw new IllegalArgumentException("Illegal instruction");
+            }
+        } catch(Exception ex) {
+            System.err.println("" + line);
         }
         
         return instr;
@@ -81,33 +89,58 @@ public class InstructionInputFileReader implements InputReader {
     
     /**
      * haal valid instruction line op
+     * NIET AANPASSEN, noodzakelijk voor trace prep
      * @return 
      */
     public Instruction getInstruction() {
         Instruction instr = null;
-        boolean valid = true;
-        String line;
+        String line = null;
         
         do {
             try {
                 line = reader.readLine();
                 lineNumber++;
                 if(line != null) {
-                    try {
-                        instr = createInstruction(line);
-                        valid = true;
-                    } catch(Exception ex) {
-                        valid = false;
-                        //System.err.println("" + line);
-                    }
+                    // invalid instr worden null
+                    instr = createInstruction(line);
                 }
             } catch (IOException ex) {
                 ex.printStackTrace();
                 throw new RuntimeException(ex);
             }
-        } while(line != null && !valid);
+        } while(line != null && instr == null);
         
         return instr;
+    }
+    
+    public String getLine(long thread) {
+        String line = null;
+        String[] parts;
+        long tempThread;;
+        do {
+            try {
+                line = reader.readLine();
+                lineNumber++;
+                
+                if(line != null) {
+                    parts = line.split(" ");
+                    if(parts.length >= 3) {
+                        try {
+                            tempThread = Long.parseLong(parts[1]);
+                            if(!threadsDiscovered.contains(tempThread) || tempThread == thread) {
+                                return line;
+                            }
+                        } catch(Exception e) {
+                            System.err.println(line);
+                        }
+                    }
+                }
+            } catch(IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        } while(line != null);
+        
+        return line;
     }
     
     @Override
@@ -116,14 +149,30 @@ public class InstructionInputFileReader implements InputReader {
             return null;
         }
         
+        String line = null;
         Instruction instr = null;
+        do {
+            line = getLine(thread);
+            if(line != null) {
+                instr = createInstruction(line);
+                if(instr != null && instr.getThread() != thread) {
+                    threadsDiscovered.add(instr.getThread());
+                    cpu.addThread(instr.getThread(), lineNumber);
+                    instr = null;
+                }
+            } else {
+                instr = null;
+            }
+        } while(line != null && instr == null);
+        
+        /*
         do{
             instr = getInstruction();
             if(instr != null) {
                 cpu.addThread(instr.getThread(), lineNumber-1);
             }
         } while(instr != null && instr.getThread() != thread);
-        
+        */
         if(instr == null) {
             try {
                 reader.close();

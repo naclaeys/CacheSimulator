@@ -14,6 +14,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 
 /**
  *
@@ -32,23 +33,20 @@ public class TracePreparation {
         if(!input.isFile()) {
             throw new IllegalArgumentException("File not found: " + args[0]);
         }
-        File output = new File(args[args.length - 1]);
-        if(output.exists() && !output.isFile()) {
-            throw new IllegalArgumentException("File not found: " + args[1]);
-        }
-        if(output.exists()) {
-            output.delete();
-        }
-        output.createNewFile();
+        String output = args[args.length - 1];
         
         InstructionInputFileReader reader = new InstructionInputFileReader(input, null, 0);
-        BufferedWriter writer = new BufferedWriter(new FileWriter(output));
+        HashMap<Long, BufferedWriter> writers = new HashMap<>();
         
         Instruction instr = reader.getInstruction();
+        long firstThread = instr.getThread();
+        writers.put(firstThread, new BufferedWriter(new FileWriter(createOutputFile(output, firstThread))));
         while(instr != null) {    
             
             while(instr instanceof NormalInstruction) {
-                long counting = 0;
+                checkThread(output, instr.getThread(), writers, firstThread);
+                
+                long counting = ((NormalInstruction)instr).getAmount() - 1;
                 long threadId = instr.getThread();
                 ArrayList<Address> addressList = new ArrayList<>();
                 
@@ -61,18 +59,45 @@ public class TracePreparation {
                 Collections.sort(addressList);
                 Address instrAddress = addressList.get(addressList.size()/2);
                 String description = "@I " + threadId + " " + instrAddress.toString() + " " + counting;
-                writer.write(description);
-                writer.newLine();
+                writeInstruction(description, writers.get(threadId));
             }
+            
             if(instr != null) {
-                writer.write(instr.getDescription());
-                writer.newLine();
+                checkThread(output, instr.getThread(), writers, firstThread);
+                writeInstruction(instr.getDescription(), writers.get(instr.getThread()));
                 
                 instr = reader.getInstruction();
             }
         }
         
-        writer.close();
+        for(BufferedWriter writer: writers.values()) {
+            writer.close();
+        }
+    }
+    
+    private static File createOutputFile(String output, long thread) throws IOException {
+        File outputFile = new File(output + "" + thread + ".txt");
+        if(outputFile.exists() && !outputFile.isFile()) {
+            throw new IllegalArgumentException("wrong file name: " + output);
+        }
+        if(outputFile.exists()) {
+            outputFile.delete();
+        }
+        outputFile.createNewFile();
+        return outputFile;
+    }
+    
+    private static void checkThread(String output, long thread, HashMap<Long, BufferedWriter> writers, long firstThread) throws IOException {
+        if(!writers.containsKey(thread)) {
+            writers.put(thread, new BufferedWriter(new FileWriter(createOutputFile(output, thread))));
+            
+            writeInstruction("@S " + thread, writers.get(firstThread));
+        }
+    }
+    
+    private static void writeInstruction(String description, BufferedWriter writer) throws IOException {
+        writer.write(description);
+        writer.newLine();
     }
     
 }

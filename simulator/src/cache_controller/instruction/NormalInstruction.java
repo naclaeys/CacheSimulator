@@ -22,6 +22,10 @@ public class NormalInstruction extends Instruction {
         super(description, thread, instructionAdress);
         this.amount = amount;
     }
+
+    public long getAmount() {
+        return amount;
+    }
     
     @Override
     public long getExecutionTime(Cache cache) {

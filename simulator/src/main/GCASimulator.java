@@ -5,7 +5,6 @@
 package main;
 
 import cache.BasicCache;
-import cache.Cache;
 import cache.TwoLayerCache;
 import cache_controller.CPU;
 import cache_controller.instruction.Instruction;
@@ -73,7 +72,7 @@ public class GCASimulator {
         
         cpu.start();
         
-        System.out.println("");
+        System.out.println("--");
         
         System.out.println("cyclus count: " + cpu.getCycleCount());
         for(int i = 0; i < coreCount; i++) {

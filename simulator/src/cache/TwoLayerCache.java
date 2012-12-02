@@ -68,7 +68,7 @@ public class TwoLayerCache extends Cache {
 
     @Override
     public void printStats() {
-        super.printStats();
+        //super.printStats();
         System.out.println("layer1 toegangen: " + (layer1.getTotalMisses() + layer1.getCacheHits()));
         System.out.println("layer1 missers: " + layer1.getTotalMisses());
         System.out.println("layer1 hits: " + layer1.getCacheHits());
