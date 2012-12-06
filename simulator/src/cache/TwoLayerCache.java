@@ -70,11 +70,13 @@ public class TwoLayerCache extends Cache {
     public void printStats() {
         //super.printStats();
         System.out.println("layer1 toegangen: " + (layer1.getTotalMisses() + layer1.getCacheHits()));
-        System.out.println("layer1 missers: " + layer1.getTotalMisses());
+        System.out.println("layer1 cold missers: " + layer1.getColdMiss());
+        System.out.println("layer1 conflict missers: " + layer1.getConflictMiss());
         System.out.println("layer1 hits: " + layer1.getCacheHits());
         
         System.out.println("layer2 toegangen: " + (layer2.getTotalMisses() + layer2.getCacheHits()));
-        System.out.println("layer2 missers: " + layer2.getTotalMisses());
+        System.out.println("layer2 cold missers: " + layer2.getColdMiss());
+        System.out.println("layer2 conflict missers: " + layer2.getConflictMiss());
         System.out.println("layer2 hits: " + layer2.getCacheHits());
     }
     

@@ -48,20 +48,19 @@ public class Core {
     
     private InstructionThread getExecutingThread() {
         InstructionThread chosenThread = null;
+        int previousIndex = index;
         
         Iterator<InstructionThread> it = threads.listIterator(index);
-        int count = 0;
         while(it.hasNext() && chosenThread == null) {
             increaseIndex();
-            count++;
             InstructionThread thread = it.next();
             if(thread.getWaitingTime() == 0) {
                 chosenThread = thread;
             }
         }
-        if(chosenThread == null && count < threads.size()) {
+        if(chosenThread == null && index == 0) {
             it = threads.listIterator(index);
-            while(it.hasNext() && chosenThread == null) {
+            while(it.hasNext() && chosenThread == null && index < previousIndex) {
                 increaseIndex();
                 InstructionThread thread = it.next();
                 if(thread.getWaitingTime() == 0) {
