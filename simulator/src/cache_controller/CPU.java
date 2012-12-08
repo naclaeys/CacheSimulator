@@ -7,7 +7,6 @@ package cache_controller;
 import cache.TwoLayerCache;
 import inputreader.InstructionInputFileReader;
 import java.util.HashSet;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 /**
  *
@@ -15,18 +14,18 @@ import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
  */
 public class CPU {
     
-    public static final long JUMP = 10000;
-    
     private long cycleCount;
     
     private String input;
+    private int linePrintMark;
     
     private Core[] cores;
     private HashSet<Long> threadsDiscovered;
     
-    public CPU(String input, TwoLayerCache[] caches) {
+    public CPU(String input, int linePrintMark, TwoLayerCache[] caches) {
         this.cycleCount = 0;
         this.input = input;
+        this.linePrintMark = linePrintMark;
         
         this.cores = new Core[caches.length];
         for(int i = 0; i < cores.length; i++) {
@@ -74,7 +73,7 @@ public class CPU {
             
             cycleCount++;
             jumpIndex ++;
-            if(jumpIndex >= JUMP) {
+            if(jumpIndex >= linePrintMark) {
                 jumpIndex = 0;
                 String print = "";
                 for(int i = 0; i < cores.length; i++) {

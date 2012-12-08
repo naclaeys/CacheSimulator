@@ -40,6 +40,7 @@ public class InstructionInputFileReader implements InputReader {
         read = 0;
         count = 0;
         window = new JFrame(input.getName());
+        window.setFocusableWindowState(false);
         window.setVisible(true);
         window.setLayout(new FlowLayout());
         bar = new JProgressBar(0, 1000);
