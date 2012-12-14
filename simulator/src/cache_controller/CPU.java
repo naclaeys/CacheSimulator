@@ -5,8 +5,10 @@
 package cache_controller;
 
 import cache.TwoLayerCache;
+import cache_controller.instruction.InstructionThread;
 import inputreader.InstructionInputFileReader;
 import java.util.HashSet;
+import main.Stats;
 
 /**
  *
@@ -14,18 +16,19 @@ import java.util.HashSet;
  */
 public class CPU {
     
+    private Stats stats;
+    
     private long cycleCount;
     
-    private String input;
     private int linePrintMark;
     
     private Core[] cores;
     private HashSet<Long> threadsDiscovered;
     
-    public CPU(String input, int linePrintMark, TwoLayerCache[] caches) {
+    public CPU(int linePrintMark, TwoLayerCache[] caches, Stats stats) {
         this.cycleCount = 0;
-        this.input = input;
         this.linePrintMark = linePrintMark;
+        this.stats = stats;
         
         this.cores = new Core[caches.length];
         for(int i = 0; i < cores.length; i++) {
@@ -52,7 +55,9 @@ public class CPU {
                     min = i;
                 }
             }
-            cores[min].addThread(thread, reader);
+            InstructionThread t = new InstructionThread(thread, reader);
+            cores[min].addThread(t);
+            stats.addThread(t);
         }
     }
 
@@ -71,6 +76,7 @@ public class CPU {
                 done &= cores[i].getThreadCount() == 0;
             }
             
+            stats.nextCycle(cycleCount);
             cycleCount++;
             /*
             jumpIndex ++;

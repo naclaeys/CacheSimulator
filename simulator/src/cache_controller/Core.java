@@ -7,7 +7,6 @@ package cache_controller;
 import cache.TwoLayerCache;
 import cache_controller.instruction.Instruction;
 import cache_controller.instruction.InstructionThread;
-import inputreader.InstructionInputFileReader;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -16,7 +15,7 @@ import java.util.LinkedList;
  * @author Nathan
  */
 public class Core {
-
+    
     private TwoLayerCache cache;
     
     private long previousCacheMiss1;
@@ -99,8 +98,8 @@ public class Core {
         }        
     }
     
-    public void addThread(long thread, InstructionInputFileReader reader) {
-        threads.add(index, new InstructionThread(thread, reader));
+    public void addThread(InstructionThread thread) {
+        threads.add(index, thread);
     }
     
     public int getThreadCount() {

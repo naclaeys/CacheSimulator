@@ -73,7 +73,8 @@ public class GCASimulator {
             }
         }
         
-        CPU cpu = new CPU(input, linePrintMark, caches);
+        Stats stats = new Stats();
+        CPU cpu = new CPU(linePrintMark, caches, stats);
         
         InstructionInputFileReader reader = new InstructionInputFileReader(new File(input + ".txt"), input, cpu);
         Instruction instr = reader.getInstruction();
