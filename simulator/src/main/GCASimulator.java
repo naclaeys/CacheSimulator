@@ -48,6 +48,18 @@ public class GCASimulator {
             }
         }
         
+        System.out.println("input " + input);
+        System.out.println("linePrintMark " + linePrintMark);
+        System.out.println("coreCount " + coreCount);
+        System.out.println("shared " + shared);
+        System.out.println("blockCount1 L1 " + blockCount1);
+        System.out.println("ways1 L1 " + ways1);
+        System.out.println("blockCount2 L2 " + blockCount2);
+        System.out.println("ways2 L2 " + ways2);
+        if(configuration != null) {
+            System.out.println("configuration" + configuration.getName());
+        }
+        
         TwoLayerCache[] caches = new TwoLayerCache[coreCount];
         if(shared) {
             BasicCache layer2 = new BasicCache(HIT_COST_LAYER2, MISS_COST_LAYER2, blockCount2, ways2, blockSize);
@@ -70,7 +82,6 @@ public class GCASimulator {
         cpu.start();
         
         System.out.println("--");
-        
         System.out.println("cyclus count: " + cpu.getCycleCount());
         for(int i = 0; i < coreCount; i++) {
             caches[i].printStats();

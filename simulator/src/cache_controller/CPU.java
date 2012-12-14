@@ -72,6 +72,7 @@ public class CPU {
             }
             
             cycleCount++;
+            /*
             jumpIndex ++;
             if(jumpIndex >= linePrintMark) {
                 jumpIndex = 0;
@@ -80,7 +81,7 @@ public class CPU {
                     print += cores[i].print(i, cycleCount);                    
                 }
                 System.out.print(print);
-            }
+            }*/
         }
     }
     
