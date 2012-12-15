@@ -53,6 +53,7 @@ public class GCASimulator {
         System.out.println("addressBlockSize " + addressBlockSize);
         System.out.println("coreCount " + coreCount);
         System.out.println("shared " + shared);
+        System.out.println("cacheBlockSize " + blockSize);
         System.out.println("blockCount1 L1 " + blockCount1);
         System.out.println("ways1 L1 " + ways1);
         System.out.println("blockCount2 L2 " + blockCount2);
