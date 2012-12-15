@@ -56,13 +56,13 @@ public class AddressBlock {
 
     @Override
     public String toString() {
-        String block = "J:" + jumpCount + System.lineSeparator();
+        String block = "J:" + address + ":" + jumpCount + System.lineSeparator();
         
         for(AddressBlock next: nextAmount.keySet()) {
             block += "N:" + address + ":" + nextAmount.get(next) + ":" + next.getAddress() + System.lineSeparator();
         }
         
-        block += "C:" + stats.toString() + System.lineSeparator();
+        block += "C:" + address + ":" + stats.toString() + System.lineSeparator();
         
         return block;
     }

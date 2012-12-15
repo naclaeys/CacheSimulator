@@ -90,6 +90,7 @@ public class GCASimulator {
             System.out.println("core " + i + ":");
             System.out.println("");
             caches[i].print();
+            System.out.println("");
         }
         System.out.println("");
         

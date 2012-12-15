@@ -54,7 +54,8 @@ public class Stats {
     
     public void print() {
         for(AddressBlock block: addressBlocks.values()) {
-            System.out.println(block.toString());
+            // is een multi line string die zelf voor line separation zorgt!
+            System.out.print(block.toString());
         }
     }
     
