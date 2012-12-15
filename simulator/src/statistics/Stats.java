@@ -38,7 +38,8 @@ public class Stats {
     public void nextCycle(long currentCycle) {
         for(StatThread thread: threads) {
             if(thread.wasActive()) {
-                Long address = thread.getAddressIndex(addressBlockSize);
+                thread.update();
+                long address = thread.getAddressIndex(addressBlockSize);
                 if(!addressBlocks.containsKey(address)) {
                     addressBlocks.put(address, new AddressBlock(address));
                 }
@@ -47,7 +48,9 @@ public class Stats {
                 thread.getPrevBlock().addNext(block);
                 thread.setPrevBlock(block);
                 
-                thread.getCache().getStats().addChangeToStat(block.getStats());
+                CacheStats cacheStats = thread.getCache().getStats();
+                cacheStats.addChangeToStat(block.getStats());
+                cacheStats.forgetChanges();
             }
         }
     }

@@ -79,7 +79,9 @@ public class GCASimulator {
         
         InstructionInputFileReader reader = new InstructionInputFileReader(new File(input + ".txt"), input, cpu);
         Instruction instr = reader.getInstruction();
-        cpu.addThread(instr.getThread(), reader);
+        reader.close();
+        // nieuwe reader om eerste instr niet te missen
+        cpu.addThread(instr.getThread(), new InstructionInputFileReader(new File(input + ".txt"), input, cpu));
         
         cpu.start();
         

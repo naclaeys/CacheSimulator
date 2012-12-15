@@ -61,14 +61,17 @@ public class CacheStats {
     public void addChangeToStat(CacheStats stat) {
         if(hitAdded) {
             stat.addCacheHit();
-            hitAdded = false;
         } else if(coldMissAdded) {
             stat.addColdMiss();
-            coldMissAdded = false;
         } else if(conflictMissAdded) {
             stat.addConflictMiss();
-            conflictMissAdded = false;
         }
+    }
+    
+    public void forgetChanges() {
+        hitAdded = false;
+        coldMissAdded = false;
+        conflictMissAdded = false;
     }
 
     @Override

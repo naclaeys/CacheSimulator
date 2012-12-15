@@ -5,19 +5,24 @@
 package cache;
 
 import cpu.instruction.Address;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import statistics.CacheStats;
 
 /**
  *
  * @author Nathan
  */
-public class TwoLayerCache extends Cache {
+public class TwoLayerCache extends Cache implements ChangeListener{
     
     private BasicCache layer1;
     private BasicCache layer2;
     
     public TwoLayerCache(BasicCache layer1, BasicCache layer2) {
+        super();
         this.layer1 = layer1;
         this.layer2 = layer2;
+        layer2.addChangeListener(this);
     }
     
     public TwoLayerCache(long hitCost, long missCost, int blockCount, int ways, int blockSize, BasicCache layer2) {
@@ -52,12 +57,18 @@ public class TwoLayerCache extends Cache {
         
         if(layer1.isHit(adress)) {
             time = layer1.getFetchTime(adress);
+            getStats().addCacheHit();
         } else {
             layer1.getFetchTime(adress);
             time = layer2.getFetchTime(adress);
         }
         
         return time;
+    }
+    
+    @Override
+    public void stateChanged(ChangeEvent e) {
+        layer2.getStats().addChangeToStat(getStats());
     }
 
     @Override

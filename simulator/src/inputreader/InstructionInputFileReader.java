@@ -122,8 +122,7 @@ public class InstructionInputFileReader implements InputReader {
                     instr = createInstruction(line);
                 } else {
                     try {
-                        window.dispose();
-                        reader.close();
+                        close();
                     } catch (IOException ex) {
                         throw new RuntimeException(ex);
                     } finally {
@@ -154,5 +153,10 @@ public class InstructionInputFileReader implements InputReader {
         } while(instr != null && instr.getThread() != thread);
                 
         return instr;
+    }
+    
+    public void close() throws IOException {
+        reader.close();
+        window.dispose();
     }
 }

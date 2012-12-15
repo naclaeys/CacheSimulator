@@ -48,10 +48,10 @@ public class StatThread {
     }
     
     public boolean wasActive() {
-        if(thread.getInstruction() != null && prevInstruction != thread.getInstruction()) {
-            prevInstruction = thread.getInstruction();
-            return true;
-        }
-        return false;
+        return thread.getInstruction() != null && prevInstruction != thread.getInstruction();
+    }
+    
+    public void update() {
+        prevInstruction = thread.getInstruction();
     }
 }
