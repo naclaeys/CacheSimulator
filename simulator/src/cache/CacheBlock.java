@@ -4,7 +4,7 @@
  */
 package cache;
 
-import cache_controller.instruction.Address;
+import cpu.instruction.Address;
 
 /**
  *

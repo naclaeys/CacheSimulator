@@ -4,10 +4,11 @@
  */
 package cache;
 
-import cache_controller.instruction.Address;
+import cpu.instruction.Address;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
+import statistics.CacheStats;
 
 /**
  *
@@ -15,64 +16,34 @@ import javax.swing.event.EventListenerList;
  */
 public abstract class Cache {
     
-    private long cacheHits;
-    
-    private long coldMiss;
-    private long conflictMiss;
+    private CacheStats stats;
     
     public Cache() {
-        cacheHits = 0;
-        coldMiss = 0;
-        conflictMiss = 0;
-    }
-    
-    public long getCacheHits() {
-        return cacheHits;
+        stats = new CacheStats();
     }
 
-    protected void setCacheHits(long cacheHits) {
-        this.cacheHits = cacheHits;
-    }
-
-    public long getColdMiss() {
-        return coldMiss;
-    }
-
-    protected void setColdMiss(long coldMiss) {
-        this.coldMiss = coldMiss;
-    }
-
-    public long getConflictMiss() {
-        return conflictMiss;
-    }
-
-    protected void setConflictMiss(long conflictMiss) {
-        this.conflictMiss = conflictMiss;
+    public CacheStats getStats() {
+        return stats;
     }
     
     protected void addCacheHit() {
-        cacheHits++;
+        stats.addCacheHit();
         fireStateChanged();
     }
     
     protected void addColdMiss() {
-        coldMiss++;
+        stats.addColdMiss();
         fireStateChanged();
     }
     
     protected void addConflictMiss() {
-        conflictMiss++;
+        stats.addConflictMiss();
         fireStateChanged();
     }
     
-    public long getTotalMisses() {
-        return coldMiss + conflictMiss;
-    }
-    
-    public void printStats() {
-        System.out.println("cache toegangen: " + (getTotalMisses() + getCacheHits()));
-        System.out.println("cache missers: " + getTotalMisses());
-        System.out.println("cache hits: " + getCacheHits());
+    public void print() {
+        System.out.println("toegangen:cold misses:conflict misses:hits");
+        System.out.println("" + (stats.getTotalMisses()+stats.getCacheHits()) + ":" + stats.toString());
     }
     
     // dit geeft enkel terug of dit in de cache zit of niet, verandert niets aan de cache

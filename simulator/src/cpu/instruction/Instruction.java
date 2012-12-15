@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package cache_controller.instruction;
+package cpu.instruction;
 
 import cache.Cache;
 
@@ -37,5 +37,4 @@ public abstract class Instruction {
     }
     
     public abstract long getExecutionTime(Cache cache);
-    
 }

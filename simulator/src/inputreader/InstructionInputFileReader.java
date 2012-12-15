@@ -4,10 +4,10 @@
  */
 package inputreader;
 
-import cache_controller.CPU;
-import cache_controller.instruction.Instruction;
-import cache_controller.instruction.MemoryAccess;
-import cache_controller.instruction.NormalInstruction;
+import cpu.CPU;
+import cpu.instruction.Instruction;
+import cpu.instruction.MemoryAccess;
+import cpu.instruction.NormalInstruction;
 import java.awt.FlowLayout;
 import java.io.BufferedReader;
 import java.io.File;

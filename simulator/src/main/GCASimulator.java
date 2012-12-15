@@ -6,11 +6,12 @@ package main;
 
 import cache.BasicCache;
 import cache.TwoLayerCache;
-import cache_controller.CPU;
-import cache_controller.instruction.Instruction;
+import cpu.CPU;
+import cpu.instruction.Instruction;
 import inputreader.InstructionInputFileReader;
 import java.io.File;
 import java.io.IOException;
+import statistics.Stats;
 
 /**
  *
@@ -32,7 +33,7 @@ public class GCASimulator {
             throw new IllegalArgumentException("Usage: inputFile linePrintMark coreCount shareLayer2 blockCount1 ways1 blockCount2 ways2 blockSize <configurationFile>");
         }
         String input = args[0];
-        int linePrintMark = Integer.parseInt(args[1]);
+        long addressBlockSize = Integer.parseInt(args[1]);
         int coreCount = Integer.parseInt(args[2]);
         boolean shared = Boolean.parseBoolean(args[3]);
         int blockCount1 = Integer.parseInt(args[4]);
@@ -49,7 +50,7 @@ public class GCASimulator {
         }
         
         System.out.println("input " + input);
-        System.out.println("linePrintMark " + linePrintMark);
+        System.out.println("addressBlockSize " + addressBlockSize);
         System.out.println("coreCount " + coreCount);
         System.out.println("shared " + shared);
         System.out.println("blockCount1 L1 " + blockCount1);
@@ -73,8 +74,8 @@ public class GCASimulator {
             }
         }
         
-        Stats stats = new Stats();
-        CPU cpu = new CPU(linePrintMark, caches, stats);
+        Stats stats = new Stats(addressBlockSize, caches);
+        CPU cpu = new CPU(caches, stats);
         
         InstructionInputFileReader reader = new InstructionInputFileReader(new File(input + ".txt"), input, cpu);
         Instruction instr = reader.getInstruction();
@@ -84,9 +85,16 @@ public class GCASimulator {
         
         System.out.println("--");
         System.out.println("cyclus count: " + cpu.getCycleCount());
+        System.out.println("");
         for(int i = 0; i < coreCount; i++) {
-            caches[i].printStats();
+            System.out.println("core " + i + ":");
             System.out.println("");
+            caches[i].print();
         }
+        System.out.println("");
+        
+        System.out.println("--");
+        System.out.println("");
+        stats.print();
     }
 }

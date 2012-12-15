@@ -2,13 +2,13 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package cache_controller;
+package cpu;
 
 import cache.TwoLayerCache;
-import cache_controller.instruction.InstructionThread;
+import cpu.instruction.InstructionThread;
 import inputreader.InstructionInputFileReader;
 import java.util.HashSet;
-import main.Stats;
+import statistics.Stats;
 
 /**
  *
@@ -20,14 +20,11 @@ public class CPU {
     
     private long cycleCount;
     
-    private int linePrintMark;
-    
     private Core[] cores;
     private HashSet<Long> threadsDiscovered;
     
-    public CPU(int linePrintMark, TwoLayerCache[] caches, Stats stats) {
+    public CPU(TwoLayerCache[] caches, Stats stats) {
         this.cycleCount = 0;
-        this.linePrintMark = linePrintMark;
         this.stats = stats;
         
         this.cores = new Core[caches.length];
@@ -57,7 +54,7 @@ public class CPU {
             }
             InstructionThread t = new InstructionThread(thread, reader);
             cores[min].addThread(t);
-            stats.addThread(t);
+            stats.addThread(t, min);
         }
     }
 

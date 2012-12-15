@@ -4,7 +4,7 @@
  */
 package inputreader;
 
-import cache_controller.instruction.Instruction;
+import cpu.instruction.Instruction;
 
 /**
  *

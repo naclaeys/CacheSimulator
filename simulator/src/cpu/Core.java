@@ -2,11 +2,11 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package cache_controller;
+package cpu;
 
 import cache.TwoLayerCache;
-import cache_controller.instruction.Instruction;
-import cache_controller.instruction.InstructionThread;
+import cpu.instruction.Instruction;
+import cpu.instruction.InstructionThread;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -17,23 +17,23 @@ import java.util.LinkedList;
 public class Core {
     
     private TwoLayerCache cache;
-    
+    /*
     private long previousCacheMiss1;
     private long previousCacheHits1;
     private long previousCacheMiss2;
     private long previousCacheHits2;
-    
+    */
     private int index;
     private LinkedList<InstructionThread> threads;
     
     public Core(TwoLayerCache cache) {
         this.cache = cache;
-        
+        /*
         previousCacheMiss1 = 0;
         previousCacheHits1 = 0;
         previousCacheMiss2 = 0;
         previousCacheHits2 = 0;
-        
+        */
         index = 0;
         threads = new LinkedList<>();
     }
@@ -105,8 +105,10 @@ public class Core {
     public int getThreadCount() {
         return threads.size();
     }
-    
+    /*
     public String print(long id, long cyclus) {
+        CacheStats layer1Stats = cache.getLayer1();
+        
         long missDiff1 = cache.getLayer1().getTotalMisses() - previousCacheMiss1;
         long hitDiff1 = cache.getLayer1().getCacheHits() - previousCacheHits1;
         
@@ -131,6 +133,6 @@ public class Core {
         previousCacheHits2 = cache.getLayer2().getCacheHits();
         
         return print;
-    }
+    }*/
     
 }
