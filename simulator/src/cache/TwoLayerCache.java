@@ -5,15 +5,14 @@
 package cache;
 
 import cpu.instruction.Address;
-import javax.swing.event.ChangeEvent;
+import java.util.HashSet;
 import javax.swing.event.ChangeListener;
-import statistics.CacheStats;
 
 /**
  *
  * @author Nathan
  */
-public class TwoLayerCache extends Cache implements ChangeListener{
+public class TwoLayerCache extends Cache {
     
     private BasicCache layer1;
     private BasicCache layer2;
@@ -22,7 +21,6 @@ public class TwoLayerCache extends Cache implements ChangeListener{
         super();
         this.layer1 = layer1;
         this.layer2 = layer2;
-        layer2.addChangeListener(this);
     }
     
     public TwoLayerCache(long hitCost, long missCost, int blockCount, int ways, int blockSize, BasicCache layer2) {
@@ -47,28 +45,32 @@ public class TwoLayerCache extends Cache implements ChangeListener{
     }
 
     @Override
+    public boolean wasPresent(Address address) {
+        return layer2.wasPresent(address);
+    }
+    
+    @Override
     protected boolean isHit(Address adress) {
         return layer1.isHit(adress) || layer2.isHit(adress);
     }
 
     @Override
-    public long getFetchTime(Address adress) {
-        long time;
-        
-        if(layer1.isHit(adress)) {
-            time = layer1.getFetchTime(adress);
+    public long getFetchTime(Address address) {
+        if(layer1.isHit(address)) {
             getStats().addCacheHit();
+            return layer1.getFetchTime(address);
         } else {
-            layer1.getFetchTime(adress);
-            time = layer2.getFetchTime(adress);
+            layer1.getFetchTime(address);
+            if(layer2.isHit(address)) {
+                addCacheHit();
+            } else if(wasPresent(address)) {
+                addConflictMiss();
+            } else {
+                addColdMiss();
+            }
+            
+            return layer2.getFetchTime(address);
         }
-        
-        return time;
-    }
-    
-    @Override
-    public void stateChanged(ChangeEvent e) {
-        layer2.getStats().addChangeToStat(getStats());
     }
 
     @Override

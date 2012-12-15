@@ -60,6 +60,11 @@ public class BasicCache extends Cache {
     }
     
     @Override
+    public boolean wasPresent(Address address) {
+        return seen.contains(getCacheAddress(address));
+    }
+    
+    @Override
     protected boolean isHit(Address address) {
         Address cacheAddress = getCacheAddress(address);
         HashMap<Address, CacheBlock> map = getCorrectMap(cacheAddress);
@@ -88,7 +93,7 @@ public class BasicCache extends Cache {
             block.setAddress(cacheAddress, time);
             map.put(cacheAddress, block);
             
-            if(seen.contains(cacheAddress)) {
+            if(wasPresent(cacheAddress)) {
                 addConflictMiss();
             } else {
                 seen.add(cacheAddress);
@@ -114,6 +119,7 @@ public class BasicCache extends Cache {
         for(HashMap map: blocks) {
             map.clear();
         }
+        seen.clear();
     }
     
 }
