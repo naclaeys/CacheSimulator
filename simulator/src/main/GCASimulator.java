@@ -46,7 +46,7 @@ public class GCASimulator {
         int blockSize = Integer.parseInt(args[8]);
         boolean dynamic = Boolean.parseBoolean(args[9]);
         File configuration = null;
-        if(args.length == 10) {
+        if(args.length == 11) {
             configuration = new File(args[args.length - 1]);
             if(!configuration.isFile()) {
                 throw new IllegalArgumentException("File not found: " + args[args.length - 1]);
