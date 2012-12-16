@@ -5,16 +5,23 @@
 package cpu;
 
 import cache.TwoLayerCache;
+import configuration.CacheOptimizer;
 import cpu.instruction.Instruction;
 import cpu.instruction.InstructionThread;
 import java.util.Iterator;
 import java.util.LinkedList;
+import statistics.Stats;
 
 /**
  *
  * @author Nathan
  */
 public class Core {
+    
+    private int coreId;
+    
+    private Stats stats;
+    private CacheOptimizer optimizer;
     
     private TwoLayerCache cache;
     /*
@@ -26,8 +33,11 @@ public class Core {
     private int index;
     private LinkedList<InstructionThread> threads;
     
-    public Core(TwoLayerCache cache) {
+    public Core(int id, TwoLayerCache cache, CacheOptimizer opt, Stats stats) {
+        this.coreId = id;
         this.cache = cache;
+        this.stats = stats;
+        this.optimizer = opt;
         /*
         previousCacheMiss1 = 0;
         previousCacheHits1 = 0;
@@ -92,7 +102,11 @@ public class Core {
                     }
                     threads.remove(thread);
                 } else {
+                    optimizer.check(thread, coreId);
+                    
                     thread.setWaitingTime(instr.getExecutionTime(cache));
+                    
+                    stats.threadAction(thread, cache);
                 }
             }
         }        
@@ -100,11 +114,17 @@ public class Core {
     
     public void addThread(InstructionThread thread) {
         threads.add(index, thread);
+        optimizer.addThread(thread);
     }
     
     public int getThreadCount() {
         return threads.size();
     }
+    
+    public CacheOptimizer getOptimizer() {
+        return optimizer;
+    }
+    
     /*
     public String print(long id, long cyclus) {
         CacheStats layer1Stats = cache.getLayer1();

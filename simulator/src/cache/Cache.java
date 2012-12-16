@@ -4,6 +4,7 @@
  */
 package cache;
 
+import configuration.Configuration;
 import cpu.instruction.Address;
 import statistics.CacheStats;
 
@@ -39,6 +40,9 @@ public abstract class Cache {
         System.out.println("toegangen:cold misses:conflict misses:hits");
         System.out.println("" + (stats.getTotalMisses()+stats.getCacheHits()) + ":" + stats.toString());
     }
+    
+    public abstract Configuration getConfiguration();
+    public abstract void installConfiguration(Configuration conf);
     
     public abstract boolean wasPresent(Address address);
     

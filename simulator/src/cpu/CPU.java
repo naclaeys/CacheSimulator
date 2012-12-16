@@ -5,6 +5,7 @@
 package cpu;
 
 import cache.TwoLayerCache;
+import configuration.CacheOptimizer;
 import cpu.instruction.InstructionThread;
 import inputreader.InstructionInputFileReader;
 import java.util.HashSet;
@@ -16,20 +17,17 @@ import statistics.Stats;
  */
 public class CPU {
     
-    private Stats stats;
-    
     private long cycleCount;
     
     private Core[] cores;
     private HashSet<Long> threadsDiscovered;
     
-    public CPU(TwoLayerCache[] caches, Stats stats) {
+    public CPU(TwoLayerCache[] caches, CacheOptimizer[] optimizers, Stats stats) {
         this.cycleCount = 0;
-        this.stats = stats;
         
         this.cores = new Core[caches.length];
         for(int i = 0; i < cores.length; i++) {
-            cores[i] = new Core(caches[i]);
+            cores[i] = new Core(i, caches[i], optimizers[i], stats);
         }
         threadsDiscovered = new HashSet<>();
     }
@@ -54,7 +52,6 @@ public class CPU {
             }
             InstructionThread t = new InstructionThread(thread, reader);
             cores[min].addThread(t);
-            stats.addThread(t, min);
         }
     }
 
@@ -73,7 +70,6 @@ public class CPU {
                 done &= cores[i].getThreadCount() == 0;
             }
             
-            stats.nextCycle(cycleCount);
             cycleCount++;
             /*
             jumpIndex ++;

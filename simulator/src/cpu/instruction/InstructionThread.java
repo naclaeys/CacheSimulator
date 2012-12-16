@@ -5,6 +5,7 @@
 package cpu.instruction;
 
 import inputreader.InstructionInputFileReader;
+import statistics.AddressBlock;
 
 /**
  *
@@ -16,6 +17,7 @@ public class InstructionThread {
     private InstructionInputFileReader reader;
     
     private Instruction instruction;
+    private AddressBlock prevBlock;
     private long waitingTime;
     
     public InstructionThread(long id, InstructionInputFileReader reader) {
@@ -23,6 +25,7 @@ public class InstructionThread {
         this.reader = reader;
         instruction = null;
         waitingTime = 0;
+        prevBlock = new AddressBlock(0);
     }
 
     public long getId() {
@@ -36,6 +39,18 @@ public class InstructionThread {
 
     public Instruction getInstruction() {
         return instruction;
+    }
+    
+    public AddressBlock getPrevBlock() {
+        return prevBlock;
+    }
+
+    public void setPrevBlock(AddressBlock prevBlock) {
+        this.prevBlock = prevBlock;
+    }
+    
+    public long getAddressIndex(long addressBlockSize) {
+        return instruction.getInstructionAdress().divideBy(addressBlockSize);
     }
 
     public void setWaitingTime(long waitingTime) {

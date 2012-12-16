@@ -4,6 +4,7 @@
  */
 package cache;
 
+import configuration.Configuration;
 import cpu.instruction.Address;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,6 +22,7 @@ public class BasicCache extends Cache {
     private long hitCost;
     private long missCost;
     
+    private int blockCount;
     private int ways;
     private HashSet<Address> seen;
     private ArrayList<HashMap<Address, CacheBlock>> blocks;
@@ -33,6 +35,7 @@ public class BasicCache extends Cache {
         this.hitCost = hitCost;
         this.missCost = missCost;
         
+        this.blockCount = blockCount;
         this.ways = ways;
         this.blockSize = blockSize;
         seen = new HashSet<>();
@@ -93,7 +96,7 @@ public class BasicCache extends Cache {
             block.setAddress(cacheAddress, time);
             map.put(cacheAddress, block);
             
-            if(wasPresent(cacheAddress)) {
+            if(wasPresent(address)) {
                 addConflictMiss();
             } else {
                 seen.add(cacheAddress);
@@ -120,6 +123,22 @@ public class BasicCache extends Cache {
             map.clear();
         }
         seen.clear();
+    }
+
+    @Override
+    public void installConfiguration(Configuration conf) {
+        clearCacheMemory();
+        ways = conf.getAssociativity();
+        int size = (blockCount+ways-1)/ways;
+        blocks = new ArrayList<>(size);
+        for(int i = 0; i < size; i++) {
+            blocks.add(new HashMap<Address, CacheBlock>((int)(ways/0.75)+1));
+        }
+    }
+
+    @Override
+    public Configuration getConfiguration() {
+        return new Configuration(blockCount, ways);
     }
     
 }

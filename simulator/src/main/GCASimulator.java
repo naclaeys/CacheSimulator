@@ -6,6 +6,7 @@ package main;
 
 import cache.BasicCache;
 import cache.TwoLayerCache;
+import configuration.CacheOptimizer;
 import cpu.CPU;
 import cpu.instruction.Instruction;
 import inputreader.InstructionInputFileReader;
@@ -63,20 +64,49 @@ public class GCASimulator {
         }
         
         TwoLayerCache[] caches = new TwoLayerCache[coreCount];
+        CacheOptimizer[] optimizers = new CacheOptimizer[coreCount];
+        int size = (int)(Math.log((double)blockCount2)/Math.log(2.0))+1;
+        TwoLayerCache[][] simCaches = new TwoLayerCache[coreCount][size];
         if(shared) {
             BasicCache layer2 = new BasicCache(HIT_COST_LAYER2, MISS_COST_LAYER2, blockCount2, ways2, blockSize);
+            
+            BasicCache[] simLayer2 = new BasicCache[size];
+            int assoc = 1;
+            int j = 0;
+            while(assoc <= blockCount2) {
+                simLayer2[j] = new BasicCache(HIT_COST_LAYER2, MISS_COST_LAYER2, blockCount2, assoc, blockSize);
+                assoc *= 2;
+                j++;
+            }
+            CacheOptimizer opt = new CacheOptimizer(caches, simCaches, addressBlockSize);
+            
             for(int i = 0; i < coreCount; i++) {
                 caches[i] = new TwoLayerCache(HIT_COST_LAYER1, HIT_COST_LAYER1, blockCount1, ways1, blockSize, layer2);
+                
+                for(int k = 0; k < size; k++) {
+                    simCaches[i][k] = new TwoLayerCache(HIT_COST_LAYER1, HIT_COST_LAYER1, blockCount1, ways1, blockSize, simLayer2[k]);
+                }
+                optimizers[i] = opt;
             }
         } else {
             for(int i = 0; i < coreCount; i++) {
                 caches[i] = new TwoLayerCache(HIT_COST_LAYER1, HIT_COST_LAYER1, blockCount1, ways1, blockSize, 
                         HIT_COST_LAYER2, MISS_COST_LAYER2, blockCount2, ways2, blockSize);
+                
+                int assoc = 1;
+                int j = 0;
+                while(assoc <= blockCount2) {
+                    simCaches[i][j] = new TwoLayerCache(HIT_COST_LAYER1, HIT_COST_LAYER1, blockCount1, ways1, blockSize, 
+                        HIT_COST_LAYER2, MISS_COST_LAYER2, blockCount2, assoc, blockSize);
+                    assoc *= 2;
+                    j++;
+                }
+                optimizers[i] = new CacheOptimizer(caches, simCaches, addressBlockSize);
             }
         }
         
-        Stats stats = new Stats(addressBlockSize, caches);
-        CPU cpu = new CPU(caches, stats);
+        Stats stats = new Stats(addressBlockSize);        
+        CPU cpu = new CPU(caches, optimizers, stats);
         
         InstructionInputFileReader reader = new InstructionInputFileReader(new File(input + ".txt"), input, cpu);
         Instruction instr = reader.getInstruction();

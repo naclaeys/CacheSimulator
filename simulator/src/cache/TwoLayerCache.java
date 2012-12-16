@@ -4,9 +4,8 @@
  */
 package cache;
 
+import configuration.Configuration;
 import cpu.instruction.Address;
-import java.util.HashSet;
-import javax.swing.event.ChangeListener;
 
 /**
  *
@@ -85,6 +84,17 @@ public class TwoLayerCache extends Cache {
         layer1.print();
         System.out.println("layer2:");
         layer2.print();
+    }
+
+    @Override
+    public void installConfiguration(Configuration conf) {
+        layer1.clearCacheMemory();
+        layer2.installConfiguration(conf);
+    }
+
+    @Override
+    public Configuration getConfiguration() {
+        return layer2.getConfiguration();
     }
     
 }
