@@ -36,6 +36,7 @@ public class Stats {
         }
 
         AddressBlock block = addressBlocks.get(address);
+        block.addInstruction(thread.getInstruction());
         thread.getPrevBlock().addNext(block);
         thread.setPrevBlock(block);
 

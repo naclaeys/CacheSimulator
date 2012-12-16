@@ -7,6 +7,7 @@ package configuration;
 import cache.Cache;
 import cache.TwoLayerCache;
 import cpu.instruction.InstructionThread;
+import java.util.HashMap;
 import java.util.LinkedList;
 import statistics.AddressBlock;
 import statistics.CacheStats;
@@ -20,6 +21,8 @@ public class CacheOptimizer {
     
     private TwoLayerCache[] coreCaches;
 
+    private int currentConfig;
+    
     // [i][j]: i is core index en j is configuratie index
     private TwoLayerCache[][] simCaches;
     
@@ -38,26 +41,43 @@ public class CacheOptimizer {
         }
         threads = new LinkedList<>();
     }
+    
+    private AddressBlock getCurrentAddressBlock(InstructionThread thread, int configId) {
+        return configStats[configId].getAddressBlocks().get(thread.getAddressIndex(addressBlockSize));
+    }
 
-    private Cache getBestCache(InstructionThread thread, int core) {
+    private int getBestConfig(InstructionThread thread, int core) {
         int bestIndex = 0;
-        long best = Long.MAX_VALUE;
+        long bestGain = 0;
         for(int i = 0; i < configStats.length; i++) {
-            CacheStats cacheStats = configStats[i].getAddressBlocks().get(thread.getAddressIndex(addressBlockSize)).getStats();
-            if(cacheStats.getTotalMisses() < best) {
-                best = cacheStats.getTotalMisses();
+            long gain = 0;
+            for(InstructionThread t: threads) {
+                AddressBlock block = getCurrentAddressBlock(t, i);
+                // nieuwe potentiele colds
+                gain -= block.getMemoryCount();
+                
+                AddressBlock currentConfigBlock = getCurrentAddressBlock(thread, currentConfig);
+                gain += (currentConfigBlock.getStats().getConflictMiss()/currentConfigBlock.getJumpCount())
+                        - (block.getStats().getConflictMiss()/block.getJumpCount());
+            }
+            
+            if(gain > bestGain) {
+                bestGain = gain;
                 bestIndex = i;
             }
         }
         
-        return simCaches[core][bestIndex];
+        return bestIndex;
     }
     
     public void check(InstructionThread thread, int core) {
-        Cache cache = getBestCache(thread, core);
-        if(!coreCaches[core].getConfiguration().equals(cache.getConfiguration())) {
+        int config = getBestConfig(thread, core);
+        Cache cache = simCaches[core][config];
+        if(currentConfig != config) {
             coreCaches[core].installConfiguration(cache.getConfiguration());
             cache.clearCacheMemory();
+            
+            currentConfig = config;
         }
         
         for(int i = 0; i < simCaches[core].length; i++) {

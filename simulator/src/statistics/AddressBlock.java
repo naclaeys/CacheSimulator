@@ -4,7 +4,10 @@
  */
 package statistics;
 
+import cpu.instruction.Instruction;
+import cpu.instruction.MemoryAccess;
 import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  *
@@ -16,6 +19,7 @@ public class AddressBlock {
     
     private long jumpCount;
     private HashMap<AddressBlock, Long> nextAmount;
+    private HashSet<MemoryAccess> memoryAccess;
     
     private CacheStats stats;
 
@@ -24,6 +28,7 @@ public class AddressBlock {
         jumpCount = 0;
         nextAmount = new HashMap<>();
         stats = new CacheStats();
+        memoryAccess = new HashSet<>();
     }
 
     public long getAddress() {
@@ -53,6 +58,10 @@ public class AddressBlock {
     public HashMap<AddressBlock, Long> getNextAmount() {
         return nextAmount;
     }
+    
+    public int getMemoryCount() {
+        return memoryAccess.size();
+    }
 
     @Override
     public String toString() {
@@ -65,6 +74,12 @@ public class AddressBlock {
         block += "C:" + address + ":" + stats.toString() + System.lineSeparator();
         
         return block;
+    }
+
+    void addInstruction(Instruction instruction) {
+        if(instruction instanceof MemoryAccess) {
+            memoryAccess.add((MemoryAccess)instruction);
+        }
     }
     
 }
