@@ -37,13 +37,4 @@ public abstract class Instruction {
     }
     
     public abstract long getExecutionTime(Cache cache);
-
-    @Override
-    public boolean equals(Object obj) {
-        Instruction instr = null;
-        if(obj instanceof Instruction) {
-            instr = (Instruction)obj;
-        }
-        return instructionAdress.equals(instr.getInstructionAdress());
-    }
 }

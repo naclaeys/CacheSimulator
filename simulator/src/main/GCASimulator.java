@@ -7,6 +7,8 @@ package main;
 import cache.BasicCache;
 import cache.TwoLayerCache;
 import configuration.CacheOptimizer;
+import configuration.DummyOptimizer;
+import configuration.Optimizer;
 import cpu.CPU;
 import cpu.instruction.Instruction;
 import inputreader.InstructionInputFileReader;
@@ -31,7 +33,7 @@ public class GCASimulator {
      */
     public static void main(String[] args) throws IOException {
         if(args.length < 9 | args.length > 10) {
-            throw new IllegalArgumentException("Usage: inputFile linePrintMark coreCount shareLayer2 blockCount1 ways1 blockCount2 ways2 blockSize <configurationFile>");
+            throw new IllegalArgumentException("Usage: inputFile linePrintMark coreCount shareLayer2 blockCount1 ways1 blockCount2 ways2 blockSize at_run_time_config <configurationFile>");
         }
         String input = args[0];
         long addressBlockSize = Integer.parseInt(args[1]);
@@ -42,6 +44,7 @@ public class GCASimulator {
         int blockCount2 = Integer.parseInt(args[6]);
         int ways2 = Integer.parseInt(args[7]);
         int blockSize = Integer.parseInt(args[8]);
+        boolean dynamic = Boolean.parseBoolean(args[9]);
         File configuration = null;
         if(args.length == 10) {
             configuration = new File(args[args.length - 1]);
@@ -59,12 +62,13 @@ public class GCASimulator {
         System.out.println("ways1 L1 " + ways1);
         System.out.println("blockCount2 L2 " + blockCount2);
         System.out.println("ways2 L2 " + ways2);
+        System.out.println("at run time config: " + dynamic);
         if(configuration != null) {
             System.out.println("configuration" + configuration.getName());
         }
         
         TwoLayerCache[] caches = new TwoLayerCache[coreCount];
-        CacheOptimizer[] optimizers = new CacheOptimizer[coreCount];
+        Optimizer[] optimizers = new CacheOptimizer[coreCount];
         int size = (int)(Math.log((double)blockCount2)/Math.log(2.0))+1;
         TwoLayerCache[][] simCaches = new TwoLayerCache[coreCount][size];
         if(shared) {
@@ -102,6 +106,13 @@ public class GCASimulator {
                     j++;
                 }
                 optimizers[i] = new CacheOptimizer(caches, simCaches, addressBlockSize);
+            }
+        }
+        
+        if(!dynamic) {
+            optimizers = new CacheOptimizer[coreCount];
+            for(int i = 0; i < optimizers.length; i++) {
+                optimizers[i] = new DummyOptimizer();
             }
         }
         

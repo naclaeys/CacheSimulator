@@ -5,7 +5,7 @@
 package cpu;
 
 import cache.TwoLayerCache;
-import configuration.CacheOptimizer;
+import configuration.Optimizer;
 import cpu.instruction.Instruction;
 import cpu.instruction.InstructionThread;
 import java.util.Iterator;
@@ -21,7 +21,7 @@ public class Core {
     private int coreId;
     
     private Stats stats;
-    private CacheOptimizer optimizer;
+    private Optimizer optimizer;
     
     private TwoLayerCache cache;
     /*
@@ -33,7 +33,7 @@ public class Core {
     private int index;
     private LinkedList<InstructionThread> threads;
     
-    public Core(int id, TwoLayerCache cache, CacheOptimizer opt, Stats stats) {
+    public Core(int id, TwoLayerCache cache, Optimizer opt, Stats stats) {
         this.coreId = id;
         this.cache = cache;
         this.stats = stats;
@@ -121,7 +121,7 @@ public class Core {
         return threads.size();
     }
     
-    public CacheOptimizer getOptimizer() {
+    public Optimizer getOptimizer() {
         return optimizer;
     }
     

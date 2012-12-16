@@ -5,7 +5,7 @@
 package cpu;
 
 import cache.TwoLayerCache;
-import configuration.CacheOptimizer;
+import configuration.Optimizer;
 import cpu.instruction.InstructionThread;
 import inputreader.InstructionInputFileReader;
 import java.util.HashSet;
@@ -22,7 +22,7 @@ public class CPU {
     private Core[] cores;
     private HashSet<Long> threadsDiscovered;
     
-    public CPU(TwoLayerCache[] caches, CacheOptimizer[] optimizers, Stats stats) {
+    public CPU(TwoLayerCache[] caches, Optimizer[] optimizers, Stats stats) {
         this.cycleCount = 0;
         
         this.cores = new Core[caches.length];

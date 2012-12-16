@@ -4,6 +4,7 @@
  */
 package statistics;
 
+import cpu.instruction.Address;
 import cpu.instruction.Instruction;
 import cpu.instruction.MemoryAccess;
 import java.util.HashMap;
@@ -19,7 +20,7 @@ public class AddressBlock {
     
     private long jumpCount;
     private HashMap<AddressBlock, Long> nextAmount;
-    private HashSet<MemoryAccess> memoryAccess;
+    private HashSet<Address> memoryAccess;
     
     private CacheStats stats;
 
@@ -78,7 +79,7 @@ public class AddressBlock {
 
     void addInstruction(Instruction instruction) {
         if(instruction instanceof MemoryAccess) {
-            memoryAccess.add((MemoryAccess)instruction);
+            memoryAccess.add(instruction.getInstructionAdress());
         }
     }
     

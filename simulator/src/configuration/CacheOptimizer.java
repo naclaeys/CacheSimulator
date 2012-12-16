@@ -7,17 +7,15 @@ package configuration;
 import cache.Cache;
 import cache.TwoLayerCache;
 import cpu.instruction.InstructionThread;
-import java.util.HashMap;
 import java.util.LinkedList;
 import statistics.AddressBlock;
-import statistics.CacheStats;
 import statistics.Stats;
 
 /**
  *
  * @author Nathan
  */
-public class CacheOptimizer {
+public class CacheOptimizer extends Optimizer {
     
     private TwoLayerCache[] coreCaches;
 
@@ -47,29 +45,33 @@ public class CacheOptimizer {
     }
 
     private int getBestConfig(InstructionThread thread, int core) {
-        int bestIndex = 0;
+        int bestIndex = currentConfig;
         long bestGain = 0;
-        for(int i = 0; i < configStats.length; i++) {
-            long gain = 0;
-            for(InstructionThread t: threads) {
-                AddressBlock block = getCurrentAddressBlock(t, i);
-                // nieuwe potentiele colds
-                gain -= block.getMemoryCount();
-                
-                AddressBlock currentConfigBlock = getCurrentAddressBlock(thread, currentConfig);
-                gain += (currentConfigBlock.getStats().getConflictMiss()/currentConfigBlock.getJumpCount())
-                        - (block.getStats().getConflictMiss()/block.getJumpCount());
-            }
-            
-            if(gain > bestGain) {
-                bestGain = gain;
-                bestIndex = i;
+        
+        AddressBlock currentBlock = getCurrentAddressBlock(thread, currentConfig);
+        if(currentBlock != null) {
+            for(int i = 0; i < configStats.length; i++) {
+                long gain = 0;
+                for(InstructionThread t: threads) {
+                    AddressBlock block = getCurrentAddressBlock(t, i);
+                    // nieuwe potentiele colds
+                    gain -= block.getMemoryCount();
+
+                    gain += (currentBlock.getStats().getConflictMiss()/currentBlock.getJumpCount())
+                            - (block.getStats().getConflictMiss()/block.getJumpCount());
+                }
+
+                if(gain > bestGain) {
+                    bestGain = gain;
+                    bestIndex = i;
+                }
             }
         }
         
         return bestIndex;
     }
     
+    @Override
     public void check(InstructionThread thread, int core) {
         int config = getBestConfig(thread, core);
         Cache cache = simCaches[core][config];
@@ -86,6 +88,7 @@ public class CacheOptimizer {
         }
     }
 
+    @Override
     public void addThread(InstructionThread thread) {
         threads.add(thread);
     }
