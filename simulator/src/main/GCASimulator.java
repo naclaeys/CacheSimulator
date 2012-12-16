@@ -62,13 +62,13 @@ public class GCASimulator {
         System.out.println("ways1 L1 " + ways1);
         System.out.println("blockCount2 L2 " + blockCount2);
         System.out.println("ways2 L2 " + ways2);
-        System.out.println("at run time config: " + dynamic);
+        System.out.println("at run time config " + dynamic);
         if(configuration != null) {
             System.out.println("configuration" + configuration.getName());
         }
         
         TwoLayerCache[] caches = new TwoLayerCache[coreCount];
-        Optimizer[] optimizers = new CacheOptimizer[coreCount];
+        Optimizer[] optimizers = new Optimizer[coreCount];
         int size = (int)(Math.log((double)blockCount2)/Math.log(2.0))+1;
         TwoLayerCache[][] simCaches = new TwoLayerCache[coreCount][size];
         if(shared) {
@@ -110,7 +110,6 @@ public class GCASimulator {
         }
         
         if(!dynamic) {
-            optimizers = new CacheOptimizer[coreCount];
             for(int i = 0; i < optimizers.length; i++) {
                 optimizers[i] = new DummyOptimizer();
             }
