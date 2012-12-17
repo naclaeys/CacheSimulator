@@ -17,6 +17,8 @@ import statistics.Stats;
  */
 public class CacheOptimizer extends Optimizer {
     
+    private long reconfigCount;
+    
     private TwoLayerCache[] coreCaches;
 
     private int currentConfig;
@@ -41,6 +43,12 @@ public class CacheOptimizer extends Optimizer {
         }
         threads = new LinkedList<>();
         this.currentConfig = currentConfig;
+        reconfigCount = 0;
+    }
+
+    @Override
+    public long getReconfigCount() {
+        return reconfigCount;
     }
     
     private AddressBlock getCurrentAddressBlock(InstructionThread thread, int configId) {
@@ -51,26 +59,22 @@ public class CacheOptimizer extends Optimizer {
         int bestIndex = currentConfig;
         long bestGain = 0;
         
-        if(thread.getInstruction() != null) {
-            AddressBlock currentConfigBlock = getCurrentAddressBlock(thread, currentConfig);
-            for(int i = 0; i < configStats.length; i++) {
-                long gain = 0;
-                for(InstructionThread t: threads) {
-                    AddressBlock proposedConfigBlock = getCurrentAddressBlock(t, i);
-                    // nieuwe potentiele colds
-                    gain -= proposedConfigBlock.getMemoryCount();
+        AddressBlock currentConfigBlock = getCurrentAddressBlock(thread, currentConfig);
+        for(int i = 0; i < configStats.length; i++) {
+            long gain = 0;
+            for(InstructionThread t: threads) {
+                AddressBlock proposedConfigBlock = getCurrentAddressBlock(t, i);
+                // nieuwe potentiele colds
+                gain -= proposedConfigBlock.getMemoryCount();
 
-                    gain += (currentConfigBlock.getStats().getConflictMiss()/currentConfigBlock.getJumpCount())
-                        - (proposedConfigBlock.getStats().getConflictMiss()/proposedConfigBlock.getJumpCount());
-                }
-
-                if(gain > bestGain) {
-                    bestGain = gain;
-                    bestIndex = i;
-                }
+                gain += (currentConfigBlock.getStats().getConflictMiss()/currentConfigBlock.getJumpCount())
+                    - (proposedConfigBlock.getStats().getConflictMiss()/proposedConfigBlock.getJumpCount());
             }
-        } else {
-            threads.remove(thread);
+
+            if(gain > bestGain) {
+                bestGain = gain;
+                bestIndex = i;
+            }
         }
         
         return bestIndex;
@@ -83,22 +87,28 @@ public class CacheOptimizer extends Optimizer {
      */
     @Override
     public void check(InstructionThread thread, int core) {
-        AddressBlock currentConfigBlock = getCurrentAddressBlock(thread, currentConfig);
-        // enkel als er al blocks bestaan en we zijn geswitcht van blok, anders nutteloze controle
-        if(currentConfigBlock != null && currentConfigBlock.getJumpCount() != 0 && currentConfigBlock.getAddress() != thread.getPrevBlock().getAddress()) {
-            int config = getBestConfig(thread);
-            Cache cache = simCaches[core][config];
-            if(currentConfig != config) {
-                coreCaches[core].installConfiguration(cache.getConfiguration());
+        if(thread.getInstruction() != null) {
+            AddressBlock currentConfigBlock = getCurrentAddressBlock(thread, currentConfig);
+            // enkel als er al blocks bestaan en we zijn geswitcht van blok, anders nutteloze controle
+            if(currentConfigBlock != null && currentConfigBlock.getJumpCount() != 0 && currentConfigBlock.getAddress() != thread.getPrevBlock().getAddress()) {
+                int config = getBestConfig(thread);
+                Cache cache = simCaches[core][config];
+                if(currentConfig != config) {
+                    coreCaches[core].installConfiguration(cache.getConfiguration());
 
-                currentConfig = config;
+                    currentConfig = config;
+
+                    reconfigCount++;
+                }
             }
-        }
 
-        // voer actie hier ook door
-        for(int i = 0; i < simCaches[core].length; i++) {
-            thread.getInstruction().getExecutionTime(simCaches[core][i]);
-            configStats[i].threadAction(thread, simCaches[core][i]);
+            // voer actie hier ook door
+            for(int i = 0; i < simCaches[core].length; i++) {
+                thread.getInstruction().getExecutionTime(simCaches[core][i]);
+                configStats[i].threadAction(thread, simCaches[core][i]);
+            }
+        } else {
+            threads.remove(thread);
         }
     }
 

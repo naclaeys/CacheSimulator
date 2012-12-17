@@ -10,16 +10,10 @@ package configuration;
  */
 public class Configuration {
     
-    private int blockCount;
-    
     private int associativity;
 
-    public Configuration(int blockCount, int associativity) {
+    public Configuration(int associativity) {
         this.associativity = associativity;
-    }
-
-    public int getBlockCount() {
-        return blockCount;
     }
 
     public int getAssociativity() {
@@ -32,6 +26,6 @@ public class Configuration {
         if(obj instanceof Configuration) {
             conf = (Configuration)obj;
         }
-        return conf != null && conf.getAssociativity() == associativity && conf.getBlockCount() == blockCount;
+        return conf != null && conf.getAssociativity() == associativity ;
     }
 }

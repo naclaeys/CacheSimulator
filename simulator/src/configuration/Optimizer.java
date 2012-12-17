@@ -14,5 +14,5 @@ public abstract class Optimizer {
     
     public abstract void check(InstructionThread thread, int core);
     public abstract void addThread(InstructionThread thread);
-    
+    public abstract long getReconfigCount();
 }

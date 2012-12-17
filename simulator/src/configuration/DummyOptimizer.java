@@ -18,5 +18,10 @@ public class DummyOptimizer extends Optimizer {
 
     @Override
     public void addThread(InstructionThread thread) {}
+
+    @Override
+    public long getReconfigCount() {
+        return 0;
+    }
     
 }

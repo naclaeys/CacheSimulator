@@ -140,7 +140,7 @@ public class BasicCache extends Cache {
 
     @Override
     public Configuration getConfiguration() {
-        return new Configuration(blockCount, ways);
+        return new Configuration(ways);
     }
 
     @Override

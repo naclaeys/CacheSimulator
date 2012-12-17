@@ -8,6 +8,7 @@ import cache.BasicCache;
 import cache.TwoLayerCache;
 import configuration.CacheOptimizer;
 import configuration.DummyOptimizer;
+import configuration.ManualConfiguration;
 import configuration.Optimizer;
 import cpu.CPU;
 import cpu.instruction.Instruction;
@@ -123,6 +124,10 @@ public class GCASimulator {
             for(int i = 0; i < optimizers.length; i++) {
                 optimizers[i] = new DummyOptimizer();
             }
+        } else if(configuration != null) {
+            for(int i = 0; i < optimizers.length; i++) {
+                optimizers[i] = new ManualConfiguration(configuration, caches, addressBlockSize);
+            }
         }
         
         Stats stats = new Stats(addressBlockSize);        
@@ -140,7 +145,7 @@ public class GCASimulator {
         System.out.println("cyclus count: " + cpu.getCycleCount());
         System.out.println("");
         for(int i = 0; i < coreCount; i++) {
-            System.out.println("core " + i + ":");
+            System.out.println("core " + i + ": " + optimizers[i].getReconfigCount());
             System.out.println("");
             caches[i].print();
             System.out.println("");
