@@ -36,7 +36,7 @@ public class Stats {
     public void threadAction(InstructionThread thread, Cache cache) {
         long address = thread.getAddressIndex(addressBlockSize);
         if(!addressBlocks.containsKey(address)) {
-            addressBlocks.put(address, new AddressBlock(address));
+            addressBlocks.put(address, new AddressBlock(address, cache.getBlockSize()));
         }
 
         AddressBlock block = addressBlocks.get(address);

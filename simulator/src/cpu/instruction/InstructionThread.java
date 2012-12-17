@@ -25,7 +25,8 @@ public class InstructionThread {
         this.reader = reader;
         instruction = null;
         waitingTime = 0;
-        prevBlock = new AddressBlock(0);
+        // dummy temp block
+        prevBlock = new AddressBlock(0, 0);
     }
 
     public long getId() {

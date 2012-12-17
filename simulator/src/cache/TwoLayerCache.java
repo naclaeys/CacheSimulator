@@ -55,10 +55,10 @@ public class TwoLayerCache extends Cache {
 
     @Override
     public long getFetchTime(Address address) {
-        getStats().addAccess();
+        addAccess();
         
         if(layer1.isHit(address)) {
-            getStats().addCacheHit();
+            addCacheHit();
             return layer1.getFetchTime(address);
         } else {
             layer1.getFetchTime(address);
@@ -97,6 +97,11 @@ public class TwoLayerCache extends Cache {
     @Override
     public Configuration getConfiguration() {
         return layer2.getConfiguration();
+    }
+
+    @Override
+    public int getBlockSize() {
+        return layer1.getBlockSize();
     }
     
 }

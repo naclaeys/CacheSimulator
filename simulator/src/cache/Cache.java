@@ -36,11 +36,16 @@ public abstract class Cache {
         stats.addConflictMiss();
     }
     
+    protected void addAccess() {
+        stats.addAccess();
+    }
+    
     public void print() {
         System.out.println("toegangen:cold misses:conflict misses:hits");
         System.out.println("" + stats.getAccess() + ":" + stats.toString());
     }
     
+    public abstract int getBlockSize();
     public abstract Configuration getConfiguration();
     public abstract void installConfiguration(Configuration conf);
     

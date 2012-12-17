@@ -24,7 +24,7 @@ public class ConfigStat extends Stats{
     public void threadAction(InstructionThread thread, Cache cache) {
         long address = thread.getAddressIndex(getAddressBlockSize());
         if(!getAddressBlocks().containsKey(address)) {
-            getAddressBlocks().put(address, new AddressBlock(address));
+            getAddressBlocks().put(address, new AddressBlock(address, cache.getBlockSize()));
         }
 
         AddressBlock block = getAddressBlocks().get(address);

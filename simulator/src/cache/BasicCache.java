@@ -76,7 +76,7 @@ public class BasicCache extends Cache {
 
     @Override
     public long getFetchTime(Address address) {
-        getStats().addAccess();
+        addAccess();
         
         time++;
         
@@ -141,6 +141,11 @@ public class BasicCache extends Cache {
     @Override
     public Configuration getConfiguration() {
         return new Configuration(blockCount, ways);
+    }
+
+    @Override
+    public int getBlockSize() {
+        return blockSize;
     }
     
 }

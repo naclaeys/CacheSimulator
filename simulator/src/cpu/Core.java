@@ -24,12 +24,6 @@ public class Core {
     private Optimizer optimizer;
     
     private TwoLayerCache cache;
-    /*
-    private long previousCacheMiss1;
-    private long previousCacheHits1;
-    private long previousCacheMiss2;
-    private long previousCacheHits2;
-    */
     private int index;
     private LinkedList<InstructionThread> threads;
     
@@ -38,12 +32,7 @@ public class Core {
         this.cache = cache;
         this.stats = stats;
         this.optimizer = opt;
-        /*
-        previousCacheMiss1 = 0;
-        previousCacheHits1 = 0;
-        previousCacheMiss2 = 0;
-        previousCacheHits2 = 0;
-        */
+        
         index = 0;
         threads = new LinkedList<>();
     }
@@ -92,6 +81,9 @@ public class Core {
             if(thread != null) {
                 thread.setNextInstruction();
                 Instruction instr = thread.getInstruction();
+                
+                optimizer.check(thread, coreId);
+                
                 if(instr == null) {
                     // geen instructies over, thread is klaar
                     int threadIndex = threads.indexOf(thread);
@@ -102,8 +94,6 @@ public class Core {
                     }
                     threads.remove(thread);
                 } else {
-                    optimizer.check(thread, coreId);
-                    
                     thread.setWaitingTime(instr.getExecutionTime(cache));
                     
                     stats.threadAction(thread, cache);
@@ -124,35 +114,5 @@ public class Core {
     public Optimizer getOptimizer() {
         return optimizer;
     }
-    
-    /*
-    public String print(long id, long cyclus) {
-        CacheStats layer1Stats = cache.getLayer1();
         
-        long missDiff1 = cache.getLayer1().getTotalMisses() - previousCacheMiss1;
-        long hitDiff1 = cache.getLayer1().getCacheHits() - previousCacheHits1;
-        
-        long missDiff2 = cache.getLayer2().getTotalMisses() - previousCacheMiss2;
-        long hitDiff2 = cache.getLayer2().getCacheHits() - previousCacheHits2;
-        
-        String print = "";
-        if(missDiff2 != 0) {
-            print += "" + 0 + ";" + cyclus + ";" + missDiff2 + System.lineSeparator();
-        }
-        for(InstructionThread thread: threads) {
-            Instruction instr = thread.getInstruction();
-            if(instr != null) {
-                print += "" + 1 + ";" + cyclus + ";" + instr.getInstructionAdress() + System.lineSeparator();
-            }
-        }
-        
-        previousCacheMiss1 = cache.getLayer1().getTotalMisses();
-        previousCacheHits1 = cache.getLayer1().getCacheHits();
-        
-        previousCacheMiss2 = cache.getLayer2().getTotalMisses();
-        previousCacheHits2 = cache.getLayer2().getCacheHits();
-        
-        return print;
-    }*/
-    
 }
