@@ -77,7 +77,7 @@ public class AddressBlock {
         return block;
     }
 
-    void addInstruction(Instruction instruction) {
+    public void addInstruction(Instruction instruction) {
         if(instruction instanceof MemoryAccess) {
             memoryAccess.add(instruction.getInstructionAdress());
         }

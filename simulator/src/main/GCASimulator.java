@@ -71,6 +71,7 @@ public class GCASimulator {
         Optimizer[] optimizers = new Optimizer[coreCount];
         int size = (int)(Math.log((double)blockCount2)/Math.log(2.0))+1;
         TwoLayerCache[][] simCaches = new TwoLayerCache[coreCount][size];
+        int currentConfig = 0;
         if(shared) {
             BasicCache layer2 = new BasicCache(HIT_COST_LAYER2, MISS_COST_LAYER2, blockCount2, ways2, blockSize);
             
@@ -79,10 +80,13 @@ public class GCASimulator {
             int j = 0;
             while(assoc <= blockCount2) {
                 simLayer2[j] = new BasicCache(HIT_COST_LAYER2, MISS_COST_LAYER2, blockCount2, assoc, blockSize);
+                if(assoc == ways2) {
+                    currentConfig = j;
+                }
                 assoc *= 2;
                 j++;
             }
-            CacheOptimizer opt = new CacheOptimizer(caches, simCaches, addressBlockSize);
+            CacheOptimizer opt = new CacheOptimizer(caches, currentConfig, simCaches, addressBlockSize);
             
             for(int i = 0; i < coreCount; i++) {
                 caches[i] = new TwoLayerCache(HIT_COST_LAYER1, HIT_COST_LAYER1, blockCount1, ways1, blockSize, layer2);
@@ -102,10 +106,13 @@ public class GCASimulator {
                 while(assoc <= blockCount2) {
                     simCaches[i][j] = new TwoLayerCache(HIT_COST_LAYER1, HIT_COST_LAYER1, blockCount1, ways1, blockSize, 
                         HIT_COST_LAYER2, MISS_COST_LAYER2, blockCount2, assoc, blockSize);
+                    if(assoc == ways2) {
+                        currentConfig = j;
+                    }
                     assoc *= 2;
                     j++;
                 }
-                optimizers[i] = new CacheOptimizer(caches, simCaches, addressBlockSize);
+                optimizers[i] = new CacheOptimizer(caches, currentConfig, simCaches, addressBlockSize);
             }
         }
         

@@ -25,6 +25,10 @@ public class Stats {
         addressBlocks = new HashMap<>();
     }
 
+    public long getAddressBlockSize() {
+        return addressBlockSize;
+    }
+
     public HashMap<Long, AddressBlock> getAddressBlocks() {
         return addressBlocks;
     }
