@@ -36,6 +36,10 @@ public class AddressBlock {
         return address;
     }
     
+    public void addJumpCount() {
+        jumpCount++;
+    }
+    
     public void addNext(AddressBlock block) {
         if(!block.equals(this)) {
             if(!nextAmount.containsKey(block)) {
@@ -44,7 +48,7 @@ public class AddressBlock {
             long amount = nextAmount.get(block);
             nextAmount.put(block, amount+1);
             
-            jumpCount++;
+            block.addJumpCount();
         }
     }
 

@@ -29,7 +29,10 @@ public class ConfigStat extends Stats{
 
         AddressBlock block = getAddressBlocks().get(address);
         block.addInstruction(thread.getInstruction());
-
+        if(thread.getPrevBlock().getAddress() != address) {
+            block.addJumpCount();
+        }
+        
         CacheStats cacheStats = cache.getStats();
         cacheStats.addChangeToStat(block.getStats());
         cacheStats.forgetChanges();
