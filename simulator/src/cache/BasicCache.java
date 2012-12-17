@@ -76,6 +76,8 @@ public class BasicCache extends Cache {
 
     @Override
     public long getFetchTime(Address address) {
+        getStats().addAccess();
+        
         time++;
         
         Address cacheAddress = getCacheAddress(address);

@@ -38,7 +38,7 @@ public abstract class Cache {
     
     public void print() {
         System.out.println("toegangen:cold misses:conflict misses:hits");
-        System.out.println("" + (stats.getTotalMisses()+stats.getCacheHits()) + ":" + stats.toString());
+        System.out.println("" + stats.getAccess() + ":" + stats.toString());
     }
     
     public abstract Configuration getConfiguration();

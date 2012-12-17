@@ -18,6 +18,9 @@ public class CacheStats {
     private long conflictMiss;
     private boolean conflictMissAdded;
     
+    private long access;
+    private boolean accessAdded;
+    
     public CacheStats() {
         cacheHits = 0;
         hitAdded = false;
@@ -25,6 +28,8 @@ public class CacheStats {
         coldMissAdded = false;
         conflictMiss = 0;
         conflictMissAdded = false;
+        access = 0;
+        accessAdded = false;
     }
     
     public long getCacheHits() {
@@ -37,6 +42,10 @@ public class CacheStats {
 
     public long getConflictMiss() {
         return conflictMiss;
+    }
+
+    public long getAccess() {
+        return access;
     }
     
     public void addCacheHit() {
@@ -54,6 +63,11 @@ public class CacheStats {
         conflictMissAdded = true;
     }
     
+    public void addAccess() {
+        access++;
+        accessAdded = true;
+    }
+    
     public long getTotalMisses() {
         return coldMiss + conflictMiss;
     }
@@ -66,12 +80,16 @@ public class CacheStats {
         } else if(conflictMissAdded) {
             stat.addConflictMiss();
         }
+        if(accessAdded) {
+            stat.addAccess();
+        }
     }
     
     public void forgetChanges() {
         hitAdded = false;
         coldMissAdded = false;
         conflictMissAdded = false;
+        accessAdded = false;
     }
 
     @Override

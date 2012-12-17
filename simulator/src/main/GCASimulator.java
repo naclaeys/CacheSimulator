@@ -42,6 +42,9 @@ public class GCASimulator {
         int blockCount1 = Integer.parseInt(args[4]);
         int ways1 = Integer.parseInt(args[5]);
         int blockCount2 = Integer.parseInt(args[6]);
+        if(!shared) {
+            blockCount2 /= coreCount;
+        }
         int ways2 = Integer.parseInt(args[7]);
         int blockSize = Integer.parseInt(args[8]);
         boolean dynamic = Boolean.parseBoolean(args[9]);

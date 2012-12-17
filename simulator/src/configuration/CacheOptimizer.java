@@ -60,7 +60,7 @@ public class CacheOptimizer extends Optimizer {
                 gain -= proposedConfigBlock.getMemoryCount();
 
                 gain += (currentConfigBlock.getStats().getConflictMiss()/currentConfigBlock.getJumpCount())
-                        - (proposedConfigBlock.getStats().getConflictMiss()/proposedConfigBlock.getJumpCount());
+                    - (proposedConfigBlock.getStats().getConflictMiss()/proposedConfigBlock.getJumpCount());
             }
 
             if(gain > bestGain) {
@@ -77,7 +77,7 @@ public class CacheOptimizer extends Optimizer {
         if(thread.getInstruction() != null) {
             AddressBlock currentConfigBlock = getCurrentAddressBlock(thread, currentConfig);
             // enkel als er al blocks bestaan en we zijn geswitcht van blok, anders nutteloze controle
-            if(currentConfigBlock != null && currentConfigBlock.getAddress() != thread.getPrevBlock().getAddress()) {
+            if(currentConfigBlock != null && currentConfigBlock.getJumpCount() != 0 && currentConfigBlock.getAddress() != thread.getPrevBlock().getAddress()) {
                 int config = getBestConfig(thread, core);
                 Cache cache = simCaches[core][config];
                 if(currentConfig != config) {

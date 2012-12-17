@@ -55,6 +55,8 @@ public class TwoLayerCache extends Cache {
 
     @Override
     public long getFetchTime(Address address) {
+        getStats().addAccess();
+        
         if(layer1.isHit(address)) {
             getStats().addCacheHit();
             return layer1.getFetchTime(address);
