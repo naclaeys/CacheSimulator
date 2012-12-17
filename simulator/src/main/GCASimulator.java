@@ -73,7 +73,11 @@ public class GCASimulator {
         
         TwoLayerCache[] caches = new TwoLayerCache[coreCount];
         Optimizer[] optimizers = new Optimizer[coreCount];
-        int size = (int)(Math.log((double)blockCount2)/Math.log(2.0))+1;
+        double log = (Math.log((double)blockCount2)/Math.log(4.0));
+        int size = ((int)(log))+1;
+        if(((double)size) - log > 0.0) {
+            size++;
+        }
         TwoLayerCache[][] simCaches = new TwoLayerCache[coreCount][size];
         int currentConfig = 0;
         if(shared) {
@@ -88,6 +92,9 @@ public class GCASimulator {
                     currentConfig = j;
                 }
                 assoc *= 2;
+                if(assoc < blockCount2) {
+                    assoc *= 2;
+                }
                 j++;
             }
             CacheOptimizer opt = new CacheOptimizer(caches, currentConfig, simCaches, addressBlockSize);
@@ -114,6 +121,9 @@ public class GCASimulator {
                         currentConfig = j;
                     }
                     assoc *= 2;
+                    if(assoc < blockCount2) {
+                        assoc *= 2;
+                    }
                     j++;
                 }
                 optimizers[i] = new CacheOptimizer(caches, currentConfig, simCaches, addressBlockSize);

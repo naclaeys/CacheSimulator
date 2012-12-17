@@ -65,7 +65,7 @@ public class InstructionInputFileReader implements InputReader {
         read += line.length() + 1;
         count++;
         
-        if(count == 100) {
+        if(count >= 100) {
             count = 0;
             long max = (long)bar.getMaximum();
             bar.setValue((int)((max*read)/totalSize));
