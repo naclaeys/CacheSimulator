@@ -74,10 +74,11 @@ public class GCASimulator {
         TwoLayerCache[] caches = new TwoLayerCache[coreCount];
         Optimizer[] optimizers = new Optimizer[coreCount];
         double log = (Math.log((double)blockCount2)/Math.log(4.0));
-        int size = ((int)(log))+1;
+        int size = ((int)(log));
         if(((double)size) - log > 0.0) {
             size++;
         }
+        size++;
         TwoLayerCache[][] simCaches = new TwoLayerCache[coreCount][size];
         int currentConfig = 0;
         if(shared) {
