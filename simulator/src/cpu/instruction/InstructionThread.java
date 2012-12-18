@@ -51,7 +51,8 @@ public class InstructionThread {
     }
     
     public long getAddressIndex(long addressBlockSize) {
-        return instruction.getInstructionAdress().divideBy(addressBlockSize);
+        Address a = instruction.getInstructionAdress();
+        return a.divideBy(addressBlockSize);
     }
 
     public void setWaitingTime(long waitingTime) {

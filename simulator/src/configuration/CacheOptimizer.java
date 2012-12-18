@@ -63,12 +63,15 @@ public class CacheOptimizer extends Optimizer {
         for(int i = 0; i < configStats.length; i++) {
             long gain = 0;
             for(InstructionThread t: threads) {
-                AddressBlock proposedConfigBlock = getCurrentAddressBlock(t, i);
-                // nieuwe potentiele colds
-                gain -= proposedConfigBlock.getMemoryCount();
+                // nieuwe instructie thread, heeft nog geen instructies, moet dus ook niet meegeteld worden
+                if(t.getInstruction() != null) {
+                    AddressBlock proposedConfigBlock = getCurrentAddressBlock(t, i);
+                    // nieuwe potentiele colds
+                    gain -= proposedConfigBlock.getMemoryCount();
 
-                gain += (currentConfigBlock.getStats().getConflictMiss()/currentConfigBlock.getJumpCount())
-                    - (proposedConfigBlock.getStats().getConflictMiss()/proposedConfigBlock.getJumpCount());
+                    gain += (currentConfigBlock.getStats().getConflictMiss()/currentConfigBlock.getJumpCount())
+                        - (proposedConfigBlock.getStats().getConflictMiss()/proposedConfigBlock.getJumpCount());
+                }
             }
 
             if(gain > bestGain) {
