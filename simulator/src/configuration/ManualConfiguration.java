@@ -31,13 +31,15 @@ public class ManualConfiguration extends Optimizer {
     private HashMap<Integer, Configuration> configurations;
     private int currentPriority;
     
-    public ManualConfiguration(File configFile, TwoLayerCache[] caches, long addressBlockSize) throws FileNotFoundException, IOException {
+    public ManualConfiguration(File configFile, TwoLayerCache[] caches, long addressBlockSize, int core) throws FileNotFoundException, IOException {
         this.addressBlockSize = addressBlockSize;
         this.coreCaches = caches;
         this.reconfigCount = 0;
         
         BufferedReader reader = new BufferedReader(new FileReader(configFile));
         setConfigurations(reader);
+        
+        coreCaches[core].installConfiguration(configurations.get(currentPriority));
     }
     
     private void setConfigurations(BufferedReader reader) throws IOException {
@@ -59,6 +61,7 @@ public class ManualConfiguration extends Optimizer {
             configurations.put(priority, new Configuration((int)longs[longs.length-1]));
             
             priority++;
+            line = reader.readLine();
         }
         priorityCounts = new int[priority];
         currentPriority = priorityCounts.length-1;
@@ -83,6 +86,16 @@ public class ManualConfiguration extends Optimizer {
         }
     }
     
+    private void setNewPriorityConfig(int newHighestPriority, int core) {
+        currentPriority = newHighestPriority;
+        Configuration currentBestConfig = configurations.get(currentPriority);
+        Configuration currentConfig = coreCaches[core].getConfiguration();
+        if(!currentBestConfig.equals(currentConfig)) {
+            coreCaches[core].installConfiguration(currentBestConfig);
+            reconfigCount++;
+        }
+    }
+    
     @Override
     public void check(InstructionThread thread, int core) {
         long prevAddress = thread.getPrevBlock().getAddress();
@@ -94,22 +107,29 @@ public class ManualConfiguration extends Optimizer {
                 if(prevAddress != -1) {
                     int prevPriority = getPriority(prevAddress);
                     priorityCounts[prevPriority]--;
-                }
-                if(currentPriority > newPriority) {
-                    int currentBestPriority = getCurrentBestPriority();
-                    Configuration currentBestConfig = configurations.get(currentBestPriority);
-                    currentPriority = currentBestPriority;
-                    Configuration currentConfig = coreCaches[core].getConfiguration();
-                    if(!currentBestConfig.equals(currentConfig)) {
-                        coreCaches[core].installConfiguration(currentBestConfig);
-                        reconfigCount++;
+                    // prioriteit is mogelijk gezakt
+                    if(prevPriority == currentPriority && currentPriority < newPriority) {
+                        int newCurrentBestPriority = getCurrentBestPriority();
+                        if(newCurrentBestPriority != currentPriority) {
+                            setNewPriorityConfig(newCurrentBestPriority, core);
+                        }
                     }
+                }
+                // prioriteit is gestegen
+                if(currentPriority > newPriority) {
+                    setNewPriorityConfig(newPriority, core);
                 }
             }
         } else {
             if(prevAddress != -1) {
                 int prevPriority = getPriority(prevAddress);
                 priorityCounts[prevPriority]--;
+                if(prevPriority == currentPriority) {
+                    int newCurrentBestPriority = getCurrentBestPriority();
+                    if(newCurrentBestPriority != currentPriority) {
+                        setNewPriorityConfig(newCurrentBestPriority, core);
+                    }
+                }
             }
         }
     }

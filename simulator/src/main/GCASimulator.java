@@ -33,7 +33,7 @@ public class GCASimulator {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException {
-        if(args.length < 9 | args.length > 10) {
+        if(args.length < 10 | args.length > 11) {
             throw new IllegalArgumentException("Usage: inputFile linePrintMark coreCount shareLayer2 blockCount1 ways1 blockCount2 ways2 blockSize at_run_time_config <configurationFile>");
         }
         String input = args[0];
@@ -132,18 +132,20 @@ public class GCASimulator {
         }
         
         if(!dynamic) {
-            for(int i = 0; i < optimizers.length; i++) {
-                optimizers[i] = new DummyOptimizer();
-            }
-        } else if(configuration != null) {
-            if(shared) {
-                ManualConfiguration conf = new ManualConfiguration(configuration, caches, addressBlockSize);
-                for(int i = 0; i < optimizers.length; i++) {
-                    optimizers[i] = conf;
+            if(configuration != null) {
+                if(shared) {
+                    ManualConfiguration conf = new ManualConfiguration(configuration, caches, addressBlockSize, 0);
+                    for(int i = 0; i < optimizers.length; i++) {
+                        optimizers[i] = conf;
+                    }
+                } else {
+                    for(int i = 0; i < optimizers.length; i++) {
+                        optimizers[i] = new ManualConfiguration(configuration, caches, addressBlockSize, i);
+                    }
                 }
             } else {
                 for(int i = 0; i < optimizers.length; i++) {
-                    optimizers[i] = new ManualConfiguration(configuration, caches, addressBlockSize);
+                    optimizers[i] = new DummyOptimizer();
                 }
             }
         }
