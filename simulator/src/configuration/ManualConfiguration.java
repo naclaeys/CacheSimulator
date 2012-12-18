@@ -69,7 +69,7 @@ public class ManualConfiguration extends Optimizer {
     
     private int getCurrentBestPriority() {
         int i = 0;
-        while(priorityCounts[i] == 0 && i < priorityCounts.length) {
+        while(i < priorityCounts.length && priorityCounts[i] == 0) {
             i++;
         }
         if(i == priorityCounts.length) {
