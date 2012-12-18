@@ -26,7 +26,7 @@ public class InstructionThread {
         instruction = null;
         waitingTime = 0;
         // dummy temp block
-        prevBlock = new AddressBlock(0, 0);
+        prevBlock = new AddressBlock(-1, 0);
     }
 
     public long getId() {

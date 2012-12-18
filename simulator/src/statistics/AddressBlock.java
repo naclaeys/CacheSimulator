@@ -4,6 +4,7 @@
  */
 package statistics;
 
+import cpu.instruction.Address;
 import cpu.instruction.Instruction;
 import cpu.instruction.MemoryAccess;
 import java.util.HashMap;
@@ -84,7 +85,12 @@ public class AddressBlock {
 
     public void addInstruction(Instruction instruction) {
         if(instruction instanceof MemoryAccess) {
-            memoryAccess.add(instruction.getInstructionAdress().divideBy((long)cacheBlockSize));
+            MemoryAccess access = (MemoryAccess)instruction;
+            Address[] cacheAddress = access.getAdress();
+            for(int i = 0; i < cacheAddress.length; i++) {
+                long tag = cacheAddress[i].divideBy((long)cacheBlockSize);
+                memoryAccess.add(tag);
+            }
         }
     }
     

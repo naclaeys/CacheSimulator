@@ -66,8 +66,8 @@ public class CacheOptimizer extends Optimizer {
                 // nieuwe instructie thread, heeft nog geen instructies, moet dus ook niet meegeteld worden
                 if(t.getInstruction() != null) {
                     AddressBlock proposedConfigBlock = getCurrentAddressBlock(t, i);
-                    // nieuwe potentiele colds
-                    gain -= proposedConfigBlock.getMemoryCount();
+                    // nieuwe potentiele colds, per memory instructie zijn er ongeveer 2 toegangen
+                    gain -= proposedConfigBlock.getMemoryCount()/proposedConfigBlock.getJumpCount();
 
                     gain += (currentConfigBlock.getStats().getConflictMiss()/currentConfigBlock.getJumpCount())
                         - (proposedConfigBlock.getStats().getConflictMiss()/proposedConfigBlock.getJumpCount());

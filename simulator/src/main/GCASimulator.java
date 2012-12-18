@@ -136,8 +136,15 @@ public class GCASimulator {
                 optimizers[i] = new DummyOptimizer();
             }
         } else if(configuration != null) {
-            for(int i = 0; i < optimizers.length; i++) {
-                optimizers[i] = new ManualConfiguration(configuration, caches, addressBlockSize);
+            if(shared) {
+                ManualConfiguration conf = new ManualConfiguration(configuration, caches, addressBlockSize);
+                for(int i = 0; i < optimizers.length; i++) {
+                    optimizers[i] = conf;
+                }
+            } else {
+                for(int i = 0; i < optimizers.length; i++) {
+                    optimizers[i] = new ManualConfiguration(configuration, caches, addressBlockSize);
+                }
             }
         }
         
