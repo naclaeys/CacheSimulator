@@ -99,7 +99,7 @@ public class AddressBlock {
                 // eerste keer dat we dit bezoeken, meer potentiele cold misses hier bij tellen
                 memoryAccess.add(access.getInstructionAdress());
                 
-                for(int i = 1; i < cacheAddress.length; i++) {
+                for(int i = 0; i < cacheAddress.length; i++) {
                     long tag = cacheAddress[i].divideBy((long)cacheBlockSize);
                     if(!firstTags.contains(tag)) {
                         memoryCount++;
