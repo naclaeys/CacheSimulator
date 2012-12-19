@@ -21,7 +21,11 @@ public class AddressBlock {
     
     private long jumpCount;
     private HashMap<AddressBlock, Long> nextAmount;
-    private HashSet<Long> memoryAccess;
+    
+    private HashSet<Address> memoryAccess;
+    private HashSet<Long> firstTags;
+    private HashSet<Long> memoryTag;
+    private long memoryCount;
     
     private CacheStats stats;
 
@@ -32,6 +36,9 @@ public class AddressBlock {
         nextAmount = new HashMap<>();
         stats = new CacheStats();
         memoryAccess = new HashSet<>();
+        memoryTag = new HashSet<>();
+        firstTags = new HashSet<>();
+        memoryCount = 0;
     }
 
     public long getAddress() {
@@ -66,8 +73,8 @@ public class AddressBlock {
         return nextAmount;
     }
     
-    public int getMemoryCount() {
-        return memoryAccess.size();
+    public long getMemoryCountPerJump() {
+        return ((long)memoryTag.size())/jumpCount + memoryCount;
     }
 
     @Override
@@ -87,9 +94,25 @@ public class AddressBlock {
         if(instruction instanceof MemoryAccess) {
             MemoryAccess access = (MemoryAccess)instruction;
             Address[] cacheAddress = access.getAdress();
-            for(int i = 0; i < cacheAddress.length; i++) {
-                long tag = cacheAddress[i].divideBy((long)cacheBlockSize);
-                memoryAccess.add(tag);
+            
+            if(!memoryAccess.contains(access.getInstructionAdress())) {
+                // eerste keer dat we dit bezoeken, meer potentiele cold misses hier bij tellen
+                memoryAccess.add(access.getInstructionAdress());
+                
+                for(int i = 1; i < cacheAddress.length; i++) {
+                    long tag = cacheAddress[i].divideBy((long)cacheBlockSize);
+                    if(!firstTags.contains(tag)) {
+                        memoryCount++;
+                        firstTags.add(tag);
+                        memoryTag.add(tag);
+                    }
+                }
+            } else {
+                // hebben dit al bezocht, enkel bij tellen als het een nieuwe tag is
+                for(int i = 0; i < cacheAddress.length; i++) {
+                    long tag = cacheAddress[i].divideBy((long)cacheBlockSize);
+                    memoryTag.add(tag);
+                }
             }
         }
     }

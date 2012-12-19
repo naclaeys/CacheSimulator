@@ -67,7 +67,7 @@ public class CacheOptimizer extends Optimizer {
                 if(t.getInstruction() != null) {
                     AddressBlock proposedConfigBlock = getCurrentAddressBlock(t, i);
                     // nieuwe potentiele colds, per memory instructie zijn er ongeveer 2 toegangen
-                    gain -= proposedConfigBlock.getMemoryCount()/proposedConfigBlock.getJumpCount();
+                    gain -= proposedConfigBlock.getMemoryCountPerJump();
 
                     gain += (currentConfigBlock.getStats().getConflictMiss()/currentConfigBlock.getJumpCount())
                         - (proposedConfigBlock.getStats().getConflictMiss()/proposedConfigBlock.getJumpCount());

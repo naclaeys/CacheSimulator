@@ -27,6 +27,14 @@ public class MemoryAccess extends Instruction {
     public Address[] getAdress() {
         return adress;
     }
+    
+    public boolean isPartOfAddress(Address address) {
+        int i = 0;
+        while(i < adress.length && !adress[i].equals(address)) {
+            i++;
+        }
+        return i < adress.length;
+    }
 
     @Override
     public long getExecutionTime(Cache cache) {
