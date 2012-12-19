@@ -24,8 +24,6 @@ public class AddressBlock {
     
     private HashSet<Address> memoryAccess;
     private HashSet<Long> firstTags;
-    private HashSet<Long> memoryTag;
-    private long memoryCount;
     
     private CacheStats stats;
 
@@ -36,9 +34,7 @@ public class AddressBlock {
         nextAmount = new HashMap<>();
         stats = new CacheStats();
         memoryAccess = new HashSet<>();
-        memoryTag = new HashSet<>();
         firstTags = new HashSet<>();
-        memoryCount = 0;
     }
 
     public long getAddress() {
@@ -74,7 +70,7 @@ public class AddressBlock {
     }
     
     public long getMemoryCountPerJump() {
-        return ((long)memoryTag.size())/jumpCount + memoryCount;
+        return firstTags.size();
     }
 
     @Override
@@ -93,25 +89,15 @@ public class AddressBlock {
     public void addInstruction(Instruction instruction) {
         if(instruction instanceof MemoryAccess) {
             MemoryAccess access = (MemoryAccess)instruction;
-            Address[] cacheAddress = access.getAdress();
             
             if(!memoryAccess.contains(access.getInstructionAdress())) {
-                // eerste keer dat we dit bezoeken, meer potentiele cold misses hier bij tellen
+                // eerste keer dat we dit bezoeken, potentiele cold misses hier bij tellen
                 memoryAccess.add(access.getInstructionAdress());
                 
+                Address[] cacheAddress = access.getAdress();
                 for(int i = 0; i < cacheAddress.length; i++) {
                     long tag = cacheAddress[i].divideBy((long)cacheBlockSize);
-                    if(!firstTags.contains(tag)) {
-                        memoryCount++;
-                        firstTags.add(tag);
-                        memoryTag.add(tag);
-                    }
-                }
-            } else {
-                // hebben dit al bezocht, enkel bij tellen als het een nieuwe tag is
-                for(int i = 0; i < cacheAddress.length; i++) {
-                    long tag = cacheAddress[i].divideBy((long)cacheBlockSize);
-                    memoryTag.add(tag);
+                    firstTags.add(tag);
                 }
             }
         }

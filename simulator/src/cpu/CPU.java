@@ -57,7 +57,7 @@ public class CPU {
 
     public void start() {
         boolean done = false;
-        long jumpIndex = 0;
+        long count = 0;
         
         // cyclus
         while(!done) {
@@ -71,6 +71,11 @@ public class CPU {
             }
             
             cycleCount++;
+            count++;
+            if(count >= 1000000) {
+                count = 0;
+                System.err.println("" + cycleCount);
+            }
             /*
             jumpIndex ++;
             if(jumpIndex >= linePrintMark) {

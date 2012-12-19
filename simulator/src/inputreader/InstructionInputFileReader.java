@@ -40,7 +40,6 @@ public class InstructionInputFileReader implements InputReader {
         read = 0;
         count = 0;
         window = new JFrame(input.getName());
-        window.setFocusableWindowState(false);
         window.setVisible(true);
         window.setLayout(new FlowLayout());
         bar = new JProgressBar(0, 1000);
@@ -65,10 +64,11 @@ public class InstructionInputFileReader implements InputReader {
         read += line.length() + 1;
         count++;
         
-        if(count >= 100) {
+        if(count >= 1000) {
             count = 0;
             long max = (long)bar.getMaximum();
-            bar.setValue((int)((max*read)/totalSize));
+            int value = (int)((max*read)/totalSize);
+            bar.setValue(value);
         }
     }
     
