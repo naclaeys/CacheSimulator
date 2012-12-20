@@ -7,6 +7,7 @@ package configuration;
 import cache.Cache;
 import cache.TwoLayerCache;
 import cpu.instruction.InstructionThread;
+import java.util.HashMap;
 import java.util.LinkedList;
 import statistics.AddressBlock;
 import statistics.Stats;
@@ -18,6 +19,8 @@ import statistics.Stats;
 public class CacheOptimizer extends Optimizer {
     
     private long reconfigCount;
+    // address van address block -> count van aantal reconfigs op dat blok
+    private HashMap<Long, Long> reconfigBlocks;
     
     private TwoLayerCache[] coreCaches;
 
@@ -44,6 +47,7 @@ public class CacheOptimizer extends Optimizer {
         threads = new LinkedList<>();
         this.currentConfig = currentConfig;
         reconfigCount = 0;
+        reconfigBlocks = new HashMap<>();
     }
 
     @Override
@@ -66,7 +70,6 @@ public class CacheOptimizer extends Optimizer {
                 // nieuwe instructie thread, heeft nog geen instructies, moet dus ook niet meegeteld worden
                 if(t.getInstruction() != null) {
                     AddressBlock proposedConfigBlock = getCurrentAddressBlock(t, i);
-                    // nieuwe potentiele colds, per memory instructie zijn er ongeveer 2 toegangen
                     gain -= proposedConfigBlock.getMemoryCountPerJump();
 
                     gain += (currentConfigBlock.getStats().getConflictMiss()/currentConfigBlock.getJumpCount())
@@ -94,14 +97,22 @@ public class CacheOptimizer extends Optimizer {
             AddressBlock currentConfigBlock = getCurrentAddressBlock(thread, currentConfig);
             // enkel als er al blocks bestaan en we zijn geswitcht van blok, anders nutteloze controle
             if(currentConfigBlock != null && currentConfigBlock.getJumpCount() != 0 && currentConfigBlock.getAddress() != thread.getPrevBlock().getAddress()) {
-                int config = getBestConfig(thread);
-                Cache cache = simCaches[core][config];
-                if(currentConfig != config) {
-                    coreCaches[core].installConfiguration(cache.getConfiguration());
+                long currentAddress = currentConfigBlock.getAddress();
+                if(!reconfigBlocks.containsKey(currentAddress) || reconfigBlocks.get(currentAddress) < 10) {
+                    int config = getBestConfig(thread);
+                    Cache cache = simCaches[core][config];
+                    if(currentConfig != config) {
+                        coreCaches[core].installConfiguration(cache.getConfiguration());
 
-                    currentConfig = config;
+                        currentConfig = config;
 
-                    reconfigCount++;
+                        reconfigCount++;
+                        if(reconfigBlocks.containsKey(currentAddress)) {
+                            reconfigBlocks.put(currentAddress, reconfigBlocks.get(currentAddress)+1);
+                        } else {
+                            reconfigBlocks.put(currentAddress, (long)1);
+                        }
+                    }
                 }
             }
 
